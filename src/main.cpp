@@ -238,7 +238,7 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
         }
 
         // Display the motor temperature with appropriate color
-        pros::lcd::print(i + 1, "%s%.3F", motorLabel.c_str(), all_motors[i].get_temperature());
+        pros::lcd::print(i, "%s%.3F", motorLabel.c_str(), all_motors[i].get_temperature());
     }
 
     // Reset text color to white for any additional text you want to display
