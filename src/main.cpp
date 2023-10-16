@@ -210,12 +210,39 @@ void display_hottest_motor(std::vector<pros::Motor> all_motors){
 	controller.print(0,0,"%s %.3F", hottest_motor, highest_motor_temp);
 }
 
-//Display all motor temperatures on brain screen
-void display_all_motor_temps(std::vector<pros::Motor> all_motors){
-	//Display base motor temperatures
-	pros::lcd::print(1, "BcLeft: %.3F BcRight: %.3F", all_motors[0].get_temperature(), all_motors[1].get_temperature());
-	pros::lcd::print(2, "TpLeft: %.3F TpRight: %.3F", all_motors[2].get_temperature(), all_motors[3].get_temperature());
-	pros::lcd::print(3, "Intake: %6.3F Catapult: %.3F", all_motors[4].get_temperature(), all_motors[5].get_temperature());
+// Display all motor temperatures on brain screen
+void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
+    // Display base motor temperatures
+    for (int i = 0; i < all_motors.size(); i++) {
+        // Check if the motor temperature is above 40 degrees Celsius
+        if (all_motors[i].get_temperature() > 40) {
+            pros::lcd::set_text_color(LV_COLOR_RED); // Set text color to red
+        } else {
+            pros::lcd::set_text_color(LV_COLOR_WHITE); // Set text color to white for other motors
+        }
+
+        // Define motor labels based on your motor naming convention
+        std::string motorLabel = "";
+        if (i == 0) {
+            motorLabel = "BcLeft: ";
+        } else if (i == 1) {
+            motorLabel = "BcRight: ";
+        } else if (i == 2) {
+            motorLabel = "TpLeft: ";
+        } else if (i == 3) {
+            motorLabel = "TpRight: ";
+        } else if (i == 4) {
+            motorLabel = "Intake: ";
+        } else if (i == 5) {
+            motorLabel = "Catapult: ";
+        }
+
+        // Display the motor temperature with appropriate color
+        pros::lcd::print(i + 1, "%s%.3F", motorLabel.c_str(), all_motors[i].get_temperature());
+    }
+
+    // Reset text color to white for any additional text you want to display
+    pros::lcd::set_text_color(LV_COLOR_WHITE);
 }
 
 /**
