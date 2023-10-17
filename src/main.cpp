@@ -91,25 +91,6 @@ typedef enum{
 autonStates auton_state = OFFENSIVE;
 bool hasConfimed = false;
 
-//LLEMU CALLBACK FUNCTIONS
-void onCenterButtonPress(){
-	//Set the auton to be defensive
-	auton_state = DEFENSIVE;
-	pros::lcd::set_text(0, "DEFENSIVE");
-}
-
-void onLeftButtonPress(){
-	//Set the auton to be offensive
-	auton_state = OFFENSIVE;
-	pros::lcd::set_text(0, "OFFENSIVE");
-}
-
-void onRightButtonPress(){
-	//Set the auton to be for skills
-	auton_state = SKILLS;
-	pros::lcd::set_text(0, "SKILLS   ");
-}
-
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -123,12 +104,6 @@ void initialize() {
 	}
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
-
-	
-	// //Register the callback functions to the buttons
-	// pros::lcd::register_btn0_cb(onLeftButtonPress);
-	// pros::lcd::register_btn2_cb(onRightButtonPress);
-	// pros::lcd::register_btn1_cb(onCenterButtonPress);
 
 	while (!pros::competition::is_autonomous()){
 		if(pros::lcd::read_buttons() & LCD_BTN_LEFT){
