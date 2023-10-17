@@ -125,18 +125,36 @@ void initialize() {
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
 
 	
-	//Register the callback functions to the buttons
-	pros::lcd::register_btn0_cb(onLeftButtonPress);
-	pros::lcd::register_btn2_cb(onRightButtonPress);
-	pros::lcd::register_btn1_cb(onCenterButtonPress);
+	// //Register the callback functions to the buttons
+	// pros::lcd::register_btn0_cb(onLeftButtonPress);
+	// pros::lcd::register_btn2_cb(onRightButtonPress);
+	// pros::lcd::register_btn1_cb(onCenterButtonPress);
+
+	while (!pros::competition::is_autonomous()){
+		if(pros::lcd::read_buttons() & LCD_BTN_LEFT){
+			//Set the auton to be offensive
+			auton_state = OFFENSIVE;
+			pros::lcd::set_text(0, "OFFENSIVE");
+		}
+		if (pros::lcd::read_buttons() & LCD_BTN_CENTER){
+			//Set the auton to be defensive
+			auton_state = DEFENSIVE;
+			pros::lcd::set_text(0, "DEFENSIVE");			
+		}
+		if (pros::lcd::read_buttons() & LCD_BTN_RIGHT){
+			//Set the auton to be for skills
+			auton_state = SKILLS;
+			pros::lcd::set_text(0, "SKILLS   ");	
+		}
+		pros::delay(5);
+	}
 
 	// This loop keeps running until autonomous starts. 
 	// Whilst the loop automatically exits upon start of the auton period,
 	// we want to be double sure this is the case
-	while(!pros::competition::is_autonomous()){
-		pros::delay(5);
-	}
-	
+	// while(!pros::competition::is_autonomous()){
+	// 	pros::delay(5);
+	// }
 }
 
 
