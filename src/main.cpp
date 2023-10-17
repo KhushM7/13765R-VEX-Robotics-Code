@@ -82,15 +82,6 @@ void auton_offensive(){
 
 }
 
-//AUTONOMOUS SELECTOR stuff
-typedef enum{
-	OFFENSIVE,
-	DEFENSIVE,
-	SKILLS
-} autonStates;
-autonStates auton_state = OFFENSIVE;
-bool hasConfimed = false;
-
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -105,6 +96,41 @@ void initialize() {
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
 
+	// This loop keeps running until autonomous starts. 
+	// Whilst the loop automatically exits upon start of the auton period,
+	// we want to be double sure this is the case
+	// while(!pros::competition::is_autonomous()){
+	// 	pros::delay(5);
+	// }
+}
+
+
+/**
+ * Runs while the robot is in the disabled state of Field Management System or
+ * the VEX Competition Switch, following either autonomous or opcontrol. When
+ * the robot is enabled, this task will exit.
+ */
+void disabled() {}
+
+//AUTONOMOUS SELECTOR stuff
+typedef enum{
+	OFFENSIVE,
+	DEFENSIVE,
+	SKILLS
+} autonStates;
+autonStates auton_state = OFFENSIVE;
+bool hasConfimed = false;
+
+/**
+ * Runs after initialize(), and before autonomous when connected to the Field
+ * Management System or the VEX Competition Switch. This is intended for
+ * competition-specific initialization routines, such as an autonomous selector
+ * on the LCD.
+ *
+ * This task will exit when the robot is enabled and autonomous or opcontrol
+ * starts.
+ */
+void competition_initialize() {
 	while (!pros::competition::is_autonomous()){
 		if(pros::lcd::read_buttons() & LCD_BTN_LEFT){
 			//Set the auton to be offensive
@@ -123,33 +149,7 @@ void initialize() {
 		}
 		pros::delay(5);
 	}
-
-	// This loop keeps running until autonomous starts. 
-	// Whilst the loop automatically exits upon start of the auton period,
-	// we want to be double sure this is the case
-	// while(!pros::competition::is_autonomous()){
-	// 	pros::delay(5);
-	// }
 }
-
-
-/**
- * Runs while the robot is in the disabled state of Field Management System or
- * the VEX Competition Switch, following either autonomous or opcontrol. When
- * the robot is enabled, this task will exit.
- */
-void disabled() {}
-
-/**
- * Runs after initialize(), and before autonomous when connected to the Field
- * Management System or the VEX Competition Switch. This is intended for
- * competition-specific initialization routines, such as an autonomous selector
- * on the LCD.
- *
- * This task will exit when the robot is enabled and autonomous or opcontrol
- * starts.
- */
-void competition_initialize() {}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
