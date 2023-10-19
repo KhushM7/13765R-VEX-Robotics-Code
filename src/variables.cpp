@@ -1,5 +1,7 @@
 #include "variables.h"
 #include "main.h"
+#include "pros/adi.hpp"
+#include "pros/rotation.hpp"
 
 //Initialise devices
 pros::Controller controller(CONTROLLER_MASTER);	
@@ -23,4 +25,5 @@ pros::ADIDigitalOut claw('A');
 pros::Imu inertial(10);
 pros::Distance front_dist(9);
 pros::Distance back_dist(3);
-pros::Rotation cataRotation(14);
+pros::Rotation left_tracker(7);
+pros::Rotation right_tracker(10);

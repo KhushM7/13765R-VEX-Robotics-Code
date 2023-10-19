@@ -1,6 +1,8 @@
 //This include guard prevents the header file being included more than once
 //This is considered good practice therefore
 #include "main.h"
+#include "pros/adi.hpp"
+#include "pros/rotation.hpp"
 #ifndef VARIABLES_H
 #define VARIABLES_H
 //Define devices
@@ -26,5 +28,6 @@ extern pros::ADIDigitalOut claw;
 extern pros::Imu inertial;
 extern pros::Distance front_dist;
 extern pros::Distance back_dist;
-extern pros::Rotation cataRotation;
+extern pros::Rotation right_tracker;
+extern pros::Rotation left_tracker;
 #endif

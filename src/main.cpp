@@ -15,8 +15,6 @@
 #include <string>
 #include <vector>
 
-double initialCataRotation = 150;
-
 //Autonomous functions
 void auton_defensive(){
 	robot_move_to(160, "BACK", 1300, true);
