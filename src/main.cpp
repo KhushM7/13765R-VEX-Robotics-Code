@@ -15,6 +15,37 @@
 #include <string>
 #include <vector>
 
+
+//Odometry stuff
+double robot_x = 0; //Current x-coordinate of robot
+double robot_y = 0; //Current y-coordinate of robot
+double robot_orientation = 0; //Current heading of robot
+
+const double sL = 4.961; //Distance from left tracking wheel to centre
+const double sR = 5.118; //Distance from right tracking wheel to centre 
+const double wheelRadius = 2; //Radius of wheel 
+const double PI = 3.1415926535897931; //Pi 
+
+
+//Odometry task/code
+double centidegreesToRadians(double centidegrees){
+    return (centidegrees * 0.01 * (PI / 180.0));
+}
+
+void odometry_task(){
+	double prev_L; //Number of rotations
+	double change_in_L;//How much left tracking wheel travelled since last check
+	double change_in_R;//How much rigt tracking wheel travelled since last check
+	while (true){
+		//Arc length = radius * radians
+		change_in_L = wheelRadius * centidegreesToRadians(left_tracker.get_position()); 
+		change_in_R = wheelRadius * centidegreesToRadians(right_tracker.get_position()); //How much distance wheel travelled
+
+	}
+	
+}
+
+
 //Autonomous functions
 void auton_defensive(){
 	robot_move_to(160, "BACK", 1300, true);
@@ -250,6 +281,11 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	left_tracker.reset_position();
+	right_tracker.reset_position();
+	left_tracker.set_data_rate(5);
+	right_tracker.set_data_rate(5);
+	pros::Task odometry(odometry_task);
 	std::vector<pros::Motor> all_motors = 
 	{bottomLeft,
 	 bottomRight,
