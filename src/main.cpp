@@ -12,10 +12,63 @@
 #include "pros/rtos.hpp"
 #include "pros/screen.hpp"
 #include "variables.h"
+#include <cmath>
 #include <string>
 #include <vector>
+#include <atomic>
 
-double initialCataRotation = 150;
+
+//Odometry stuff
+
+//Current x-coordinate of robot
+static std::atomic<int> robot_x(0); 
+//Current y-coordinate of robot
+std::atomic<double> robot_y(0); 
+//Current heading of robot
+std::atomic<double> robot_orientation(0);
+
+const double sL = 4.9212598425; //Distance from left tracking wheel to centre
+const double sR = 5.0393700787; //Distance from right tracking wheel to centre 
+const double wheelRadius = 2; //Radius of wheel
+const double PI = 3.1415926535897931;
+const double wheelCircumference = 2 * PI * wheelRadius; 
+
+
+//Odometry task/code
+double centidegreesToRadians(double centidegrees){
+    return (centidegrees * 0.01 * (PI / 180.0));
+}
+
+void odometry_task(){
+	double prev_L = left_tracker.get_position(); //Number of rotations on left wheel on last frame
+	double prev_R = right_tracker.get_position(); 
+	double change_in_L;//How much left tracking wheel travelled since last check
+	double change_in_R;//How much right tracking wheel travelled since last check
+	double change_in_heading;
+	double current_heading = 0; //This is used to worrry less about synchronisation issues
+	while (true){
+		//Arc length = noRotations * circumference
+		change_in_L = wheelRadius * centidegreesToRadians(left_tracker.get_position() - prev_L); 
+		change_in_R = wheelRadius * centidegreesToRadians(right_tracker.get_position() - prev_R); //How much distance wheel travelled
+
+		//Update previous position to current position
+		prev_L = left_tracker.get_position();
+		prev_R = right_tracker.get_position(); 
+
+		change_in_heading = (change_in_L - change_in_R)/(sL + sR);
+		current_heading += change_in_heading;
+		
+
+		//Don't wait for the lock to become free - this might lose time and accuracy
+		if (robot_orientation.is_lock_free()){
+			robot_orientation.store(current_heading); //Update the current orientation
+		}		
+
+		pros::delay(5);		
+	}
+	
+}
+
 
 //Autonomous functions
 void auton_defensive(){
@@ -252,6 +305,13 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	left_tracker.reset_position();
+	right_tracker.reset_position();
+	left_tracker.set_data_rate(5);
+	right_tracker.set_data_rate(5);
+	//pros::delay(2000);
+	//pros::Task odometry(odometry_task);
+	
 	std::vector<pros::Motor> all_motors = 
 	{bottomLeft,
 	 bottomRight,
@@ -348,8 +408,11 @@ void opcontrol() {
 
 
 		//Displaying motor temperature stuff
-		display_hottest_motor(all_motors);
+		//display_hottest_motor(all_motors);
 		display_all_motor_temps(all_motors);
+		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+			robot_set_heading_PID(90);
+		}	
 
 		pros::delay(20);
 	}
