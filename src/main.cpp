@@ -305,12 +305,6 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	left_tracker.reset_position();
-	right_tracker.reset_position();
-	left_tracker.set_data_rate(5);
-	right_tracker.set_data_rate(5);
-	//pros::delay(2000);
-	//pros::Task odometry(odometry_task);
 	
 	std::vector<pros::Motor> all_motors = 
 	{bottomLeft,
@@ -410,9 +404,6 @@ void opcontrol() {
 		//Displaying motor temperature stuff
 		//display_hottest_motor(all_motors);
 		display_all_motor_temps(all_motors);
-		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-			robot_set_heading_PID(90);
-		}	
 
 		pros::delay(20);
 	}
