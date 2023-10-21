@@ -309,8 +309,8 @@ void opcontrol() {
 	right_tracker.reset_position();
 	left_tracker.set_data_rate(5);
 	right_tracker.set_data_rate(5);
-	pros::delay(2000);
-	pros::Task odometry(odometry_task);
+	//pros::delay(2000);
+	//pros::Task odometry(odometry_task);
 	
 	std::vector<pros::Motor> all_motors = 
 	{bottomLeft,
@@ -411,7 +411,7 @@ void opcontrol() {
 		//display_hottest_motor(all_motors);
 		display_all_motor_temps(all_motors);
 		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-			controller.print(0, 0, "%.3F", (robot_orientation.load() * 180 / PI));
+			robot_set_heading_PID(90);
 		}	
 
 		pros::delay(20);

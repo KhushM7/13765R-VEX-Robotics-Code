@@ -90,7 +90,7 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject, double kP, 
 	while (back_dist.get() > distanceFromObject + 5 || back_dist.get() < distanceFromObject - 5){
 		//Proportional - calculating error
 		if (sensor == "BACK"){
-			error = distanceFromObject - back_dist.get(); //Necessary to stop program giving undefined errors
+			error = distanceFromObject - back_dist.get(); 
 		}
 		else if (sensor == "FRONT"){
 			error = distanceFromObject - front_dist.get();
@@ -127,7 +127,7 @@ void robot_set_heading_PID(double angle)
 	//Let's define some variables that will be useful for PID
 	//(needs tuning)
 	double kP = 1;
-	double kI = 0;
+	double kI = 0.02;
 	double kD = 0;
 
 	double error = angle - inertial.get_heading();
@@ -136,7 +136,7 @@ void robot_set_heading_PID(double angle)
 	double prevError = angle - inertial.get_heading(); // This is needed to calculate derivative
 	double power_to_motors = 0;
 	
-	while (inertial.get_heading() < angle - 1 || inertial.get_heading() > angle + 1){
+	while (error > 0.5 || error < -0.5){
 		//Rotate using PID where the required angle is therefore greater than the current heading value
 		//Proportional - calculating the error
 		if (abs(angle - inertial.get_heading()) <= 180)
@@ -148,11 +148,11 @@ void robot_set_heading_PID(double angle)
 		{
 			if (inertial.get_heading() > angle)
 			{
-				error = 360 - angle - inertial.get_heading();
+				error = 360 + angle - inertial.get_heading();
 			}
 			else
 			{
-				error = angle - (inertial.get_heading() + 360);
+				error =  angle - inertial.get_heading() - 360;
 			}
 		}
 
@@ -205,13 +205,13 @@ void robot_set_heading(double angle){
 			}
 			else
 			{
-				error =  inertial.get_heading() - angle - 360;
+				error =  angle - inertial.get_heading() - 360;
 			}
 		}
 		//Keep rotating till you reach target
 		left_motors.move(error);
 		right_motors.move(-error);
-	} while ((error > 2 || error < -2) && pros::millis() < start_time + 2000);
+	} while ((error > 0.5 || error < -0.5));//&& pros::millis() < start_time + 2000);
 }
 
 void stop_robot(){
