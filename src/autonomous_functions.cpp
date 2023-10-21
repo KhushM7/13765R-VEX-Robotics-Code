@@ -126,8 +126,8 @@ void robot_set_heading_PID(double angle)
 {
 	//Let's define some variables that will be useful for PID
 	//(needs tuning)
-	double kP = 1;
-	double kI = 0.02;
+	double kP = 1.3;
+	double kI = 0;
 	double kD = 0;
 
 	double error = angle - inertial.get_heading();
@@ -136,7 +136,7 @@ void robot_set_heading_PID(double angle)
 	double prevError = angle - inertial.get_heading(); // This is needed to calculate derivative
 	double power_to_motors = 0;
 	
-	while (error > 0.5 || error < -0.5){
+	while (abs(error) > 1){
 		//Rotate using PID where the required angle is therefore greater than the current heading value
 		//Proportional - calculating the error
 		if (abs(angle - inertial.get_heading()) <= 180)
@@ -166,7 +166,7 @@ void robot_set_heading_PID(double angle)
 		}
 
 		// To prevent integral windup (EXPLAIN IN SKETCHBOOK + may need to adjust)
-		if (error > 10){
+		if (error > 20){
 			integral = 0;
 		}
 
