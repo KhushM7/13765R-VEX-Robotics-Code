@@ -165,7 +165,7 @@ void robot_set_heading_PID(double angle)
 			integral = 0;
 		}
 
-		// To prevent integral windup (EXPLAIN IN SKETCHBOOK + may need to adjust)
+		// To prevent integral windup 
 		if (error > 20){
 			integral = 0;
 		}

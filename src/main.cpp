@@ -339,7 +339,7 @@ void opcontrol() {
 			right_motors.brake();
 		}
 
-		//Turn on intake when Button R1 is held down
+		//Toggle intake when Button R1 is pressed (make intake go forward)
 		if (controller.get_digital_new_press(DIGITAL_R1)){
 			if (isIntakeOff){
 				//Forward intake
@@ -347,13 +347,13 @@ void opcontrol() {
 				isIntakeOff = false;
 			}
 			else{
-				//Make intake go forward
+				//Make intake stop
 				intake.brake();
 				isIntakeOff = true;
 			}
 		}
 		
-		//Turn off intake when Button R2 is pressed
+		//Turn off intake when Button R2 is pressed (make intake reverse)
 		if (controller.get_digital_new_press(DIGITAL_R2)){
 			if (isIntakeOff){
 				//Reverse intake
@@ -361,7 +361,7 @@ void opcontrol() {
 				isIntakeOff = false;
 			}
 			else{
-				//Make intake go forward
+				//Make intake stop
 				intake.brake();
 				isIntakeOff = true;
 			}
