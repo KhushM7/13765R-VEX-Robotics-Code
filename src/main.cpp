@@ -400,7 +400,7 @@ void opcontrol() {
 
 
 		//Displaying motor temperature stuff
-		//display_hottest_motor(all_motors);
+		display_hottest_motor(all_motors);
 		display_all_motor_temps(all_motors);
 
 		pros::delay(20);
