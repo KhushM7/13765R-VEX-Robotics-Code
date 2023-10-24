@@ -190,7 +190,6 @@ void robot_set_heading_PID(double angle)
 
 void robot_set_heading(double angle){	
 	double error;
-	double start_time = pros::millis();
 	
 	do {
 		//Decide direction
@@ -213,7 +212,7 @@ void robot_set_heading(double angle){
 		//Keep rotating till you reach target
 		left_motors.move(error);
 		right_motors.move(-error);
-	} while ((error > 0.5 || error < -0.5));//&& pros::millis() < start_time + 2000);
+	} while ((error > 0.5 || error < -0.5));
 }
 
 void stop_robot(){
