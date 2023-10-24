@@ -221,17 +221,15 @@ void autonomous() {
 	
 }
 
-//Gets the hottest motor, returning a two character code that represents the motor
+//Gets the hottest motor, printing a two character code that represents the motor
 // E.g. BR for back right or I  for intake
-//After the motor code, it returns the temperature of that motor
+//After the motor code, it prints the temperature of that motor
 void display_hottest_motor(std::vector<pros::Motor> all_motors){
 	int highest_motor_temp = 0;
 	std::string hottest_motor = "";
 	for (int i = 0; i < all_motors.size(); i++){			
 		if (all_motors[i].get_temperature() > highest_motor_temp){
 			highest_motor_temp = all_motors[i].get_temperature();
-			//controller.rumble(".");
-
 			//Using order of motors when list was created
 			if (i == 0){
 				hottest_motor = "BR";				

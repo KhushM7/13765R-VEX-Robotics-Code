@@ -29,7 +29,7 @@ void robot_move_to(int motor_speed, std::string sensor, double distance, bool sh
 	left_motors.move_velocity(motor_speed);
 	right_motors.move_velocity(motor_speed);
 	
-	while (distance != 0 && (error >=  5 || error <= -5)){
+	while (error >=  5 || error <= -5){
 		if (sensor == "BACK"){
 			error = distance - back_dist.get();
 		}
@@ -53,13 +53,15 @@ void robot_move_to(int motor_speed, std::string sensor, double distance, bool sh
 		pros::delay(20);		
 	}
 
-	// Only stop the motors if a distance has been set.
-	// Otherwise the motors must be stopped manually
-	if (distance != 0){
-		left_motors.brake();
-		right_motors.brake();
-	}
+	//Stop the motors
+	left_motors.brake();
+	right_motors.brake();
 	controller.print(0,0, "Done");		
+}
+
+void robot_set_velocity(double speed){
+	left_motors.move_velocity(speed);
+	right_motors.move_velocity(speed);
 }
 
 //Moves the robot until it is at a specified location, using a PID controller
