@@ -265,7 +265,7 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
             pros::lcd::set_text_color(LV_COLOR_WHITE); // Set text color to white for other motors
         }
 
-        // Define motor labels based on your motor naming convention
+        // Define motor labels based on original motor naming convention
         std::string motorLabel = "";
         if (i == 0) {
             motorLabel = "BcLeft: ";
