@@ -1,6 +1,8 @@
 #include "variables.h"
 #include "main.h"
 #include "pros/adi.hpp"
+#include "pros/motors.h"
+#include "pros/motors.hpp"
 #include "pros/rotation.hpp"
 
 //Initialise devices
@@ -14,7 +16,8 @@ pros::Motor_Group left_motors({topLeft, bottomLeft});
 pros::Motor_Group right_motors({topRight, bottomRight});
 
 pros::Motor intake(12, MOTOR_GEAR_BLUE, false);
-pros::Motor catapult(2, MOTOR_GEAR_RED, false);
+pros::Motor catapult1(2, MOTOR_GEAR_RED, false);
+pros::Motor catapult2(3, pros::E_MOTOR_GEAR_RED);
 pros::Motor lift1(7, MOTOR_GEAR_RED, false);
 pros::Motor lift2(7, MOTOR_GEAR_RED, false);
 pros::Motor_Group lift({lift1, lift2});

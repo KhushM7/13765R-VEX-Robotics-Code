@@ -246,8 +246,11 @@ void display_hottest_motor(std::vector<pros::Motor> all_motors){
 			else if (i == 4){
 				hottest_motor = "I ";
 			}
+			else if (i == 5){
+				hottest_motor = "C1";
+			}
 			else{
-				hottest_motor = "C ";
+				hottest_motor = "C2";
 			}
 		}
 	}
@@ -268,18 +271,21 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
         // Define motor labels based on original motor naming convention
         std::string motorLabel = "";
         if (i == 0) {
-            motorLabel = "BcLeft: ";
+            motorLabel = "BcLeft:  ";
         } else if (i == 1) {
             motorLabel = "BcRight: ";
         } else if (i == 2) {
-            motorLabel = "TpLeft: ";
+            motorLabel = "TpLeft:  ";
         } else if (i == 3) {
             motorLabel = "TpRight: ";
         } else if (i == 4) {
-            motorLabel = "Intake: ";
+            motorLabel = "Intake:  ";
         } else if (i == 5) {
-            motorLabel = "Catapult: ";
-        }
+            motorLabel = "Cata-1:  ";
+        } else if (i == 6){
+			motorLabel = "Cata-2:  ";
+		}
+		
 
         // Display the motor temperature with appropriate color
         pros::lcd::print(i, "%s%.3F", motorLabel.c_str(), all_motors[i].get_temperature());
@@ -310,7 +316,9 @@ void opcontrol() {
 	 topLeft,
 	 topRight,
 	 intake,
-	 catapult};
+	 catapult1,
+	 catapult2
+	 };
 
 	controller.clear_line(0);
 
@@ -391,13 +399,10 @@ void opcontrol() {
 			}
 		}
 
-		if (controller.get_digital(DIGITAL_L2)){
-			catapult.move_velocity(60);
+		if (controller.get_digital_new_press(DIGITAL_L2)){
+			catapult1.move_relative(360, 60);
+			catapult2.move_relative(360, 60);
 		}
-		else{
-			catapult.brake();
-		}
-
 
 		//Displaying motor temperature stuff
 		display_hottest_motor(all_motors);

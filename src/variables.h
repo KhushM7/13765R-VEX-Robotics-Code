@@ -17,7 +17,8 @@ extern pros::Motor_Group left_motors;
 extern pros::Motor_Group right_motors;
 
 extern pros::Motor intake;
-extern pros::Motor catapult;
+extern pros::Motor catapult1;
+extern pros::Motor catapult2;
 extern pros::Motor lift1;
 extern pros::Motor lift2;
 extern pros::Motor_Group lift;
