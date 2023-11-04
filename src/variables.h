@@ -19,16 +19,10 @@ extern pros::Motor_Group right_motors;
 extern pros::Motor intake;
 extern pros::Motor catapult1;
 extern pros::Motor catapult2;
-extern pros::Motor lift1;
-extern pros::Motor lift2;
-extern pros::Motor_Group lift;
 extern pros::ADIDigitalOut wings;
-extern pros::ADIDigitalOut claw;
 
 //Initialise sensors
 extern pros::Imu inertial;
 extern pros::Distance front_dist;
 extern pros::Distance back_dist;
-extern pros::Rotation right_tracker;
-extern pros::Rotation left_tracker;
 #endif
