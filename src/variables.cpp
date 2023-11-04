@@ -7,10 +7,10 @@
 
 //Initialise devices
 pros::Controller controller(CONTROLLER_MASTER);	
-pros::Motor topLeft(13, MOTOR_GEARSET_18, false);
-pros::Motor topRight(11, MOTOR_GEARSET_18, true);
-pros::Motor bottomLeft(12, MOTOR_GEARSET_18, true);
-pros::Motor bottomRight(17, MOTOR_GEARSET_18, false);
+pros::Motor topLeft(13, MOTOR_GEARSET_18, true);
+pros::Motor topRight(11, MOTOR_GEARSET_18, false);
+pros::Motor bottomLeft(12, MOTOR_GEARSET_18, false);
+pros::Motor bottomRight(19, MOTOR_GEARSET_18, true);
 
 pros::Motor_Group left_motors({topLeft, bottomLeft});
 pros::Motor_Group right_motors({topRight, bottomRight});
