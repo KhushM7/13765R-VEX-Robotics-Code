@@ -17,7 +17,6 @@
 #include <vector>
 #include <atomic>
 
-
 //Autonomous functions
 void auton_defensive(){
 	robot_move_to(160, "BACK", 1300, true);
@@ -275,6 +274,9 @@ void opcontrol() {
 	
 
 	while(true){
+		if (controller.get_digital(DIGITAL_B)){
+			robot_moveTo_PID("BACK", 400);
+		}
 		if (controller.get_analog(ANALOG_LEFT_Y) > 8 || controller.get_analog(ANALOG_LEFT_Y) < -8){
 			left_motors.move(controller.get_analog(ANALOG_LEFT_Y));			
 		}
@@ -337,7 +339,7 @@ void opcontrol() {
 		}
 
 		//Displaying motor temperature stuff
-		display_hottest_motor(all_motors);
+		//display_hottest_motor(all_motors);
 		display_all_motor_temps(all_motors);
 
 		pros::delay(20);

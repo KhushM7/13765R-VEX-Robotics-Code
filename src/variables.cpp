@@ -23,4 +23,4 @@ pros::ADIDigitalOut wings('H');
 //Initialise sensors
 pros::Imu inertial(18);
 pros::Distance front_dist(21); //Not yet plugged in
-pros::Distance back_dist(6);
+pros::Distance back_dist(20);
