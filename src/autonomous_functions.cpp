@@ -67,7 +67,6 @@ void robot_set_velocity(double speed){
 //Moves the robot until it is at a specified location, using a PID controller
 void robot_moveTo_PID(std::string sensor, double distanceFromObject){
     //Let's define some variables that will be useful for PID
-	//(needs tuning)
 	const double kP = 1.1;
 	const double kI = 0.;
 	const double kD = 0.6;
@@ -117,20 +116,13 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject){
 		prevError = error;
 
 		power_to_motors = (kP * error) + (kI * integral) + (kD * derivative);
-		controller.print(0, 0, "error: %.1F", error);
 
 		left_motors = power_to_motors;
 		right_motors = power_to_motors;
 
 		pros::delay(20); //Essential for both integral and derivative
     }
-
 	stop_robot();
-	pros::delay(500);
-	if (sensor == "BACK"){
-		error = distanceFromObject - back_dist.get(); 
-	}
-	controller.print(0, 0, "error: %.1F", error);
 }
 
 // Turns the robot until it has rotated to the specified angle.
@@ -138,7 +130,6 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject){
 void robot_set_heading_PID(double angle)
 {
 	//Let's define some variables that will be useful for PID
-	//(needs tuning)
 	double kP = 2.15;
 	double kI = 0.11;
 	double kD = 0.53;
