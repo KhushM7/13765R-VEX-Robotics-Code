@@ -65,19 +65,18 @@ void robot_set_velocity(double speed){
 }
 
 //Moves the robot until it is at a specified location, using a PID controller
-void robot_moveTo_PID(std::string sensor, double distanceFromObject, double kP, double kI, double kD){
+void robot_moveTo_PID(std::string sensor, double distanceFromObject){
     //Let's define some variables that will be useful for PID
-	//(needs tuning)
-	// const double kP = kP;
-	// const double kI = kI;
-	// const double kD = kD;
+	const double kP = 1.1;
+	const double kI = 0.;
+	const double kD = 0.6;
 
     double error = 0;
     double integral = 0;
     double derivative = 0;
     double prevError;
     double power_to_motors;
-    
+
 	if (sensor == "BACK"){
 		prevError = back_dist.get(); //Necessary to stop program giving undefined errors
 	}
@@ -87,10 +86,13 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject, double kP, 
 	else{
 		controller.print(0,0, "Incorrect sensor argument - must be BACK or FRONT!");
 	}
+	
+	error = prevError;
 
 	// Keep doing PID loop until the robot is within 5mm of the desired value
-	while (back_dist.get() > distanceFromObject + 5 || back_dist.get() < distanceFromObject - 5){
+	while (abs(error) > 10 || derivative >  0.05){
 		//Proportional - calculating error
+		
 		if (sensor == "BACK"){
 			error = distanceFromObject - back_dist.get(); 
 		}
@@ -100,12 +102,12 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject, double kP, 
 
 		//Integral - only 'activate' it when the error is less than 200mm (20cm)
 		//This prevents integral windup
-		if (error < 200){
+		if (abs(error) < 200){
 			integral += error;
 		}		
 
 		//Once we have reahed our desired location, we must reset the integral to prevent overshooting
-		if (error == 0){
+		if (abs(error) < 10){
 			integral = 0;
 		}
 
@@ -118,8 +120,9 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject, double kP, 
 		left_motors = power_to_motors;
 		right_motors = power_to_motors;
 
-		pros::delay(10); //Essential for both integral and derivative
+		pros::delay(20); //Essential for both integral and derivative
     }
+	stop_robot();
 }
 
 // Turns the robot until it has rotated to the specified angle.
@@ -127,10 +130,9 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject, double kP, 
 void robot_set_heading_PID(double angle)
 {
 	//Let's define some variables that will be useful for PID
-	//(needs tuning)
-	double kP = 1.3;
-	double kI = 0;
-	double kD = 0;
+	double kP = 2.15;
+	double kI = 0.11;
+	double kD = 0.53;
 
 	double error = angle - inertial.get_heading();
 	double integral = 0; //This is our integral (needed for I component)
@@ -138,7 +140,7 @@ void robot_set_heading_PID(double angle)
 	double prevError = angle - inertial.get_heading(); // This is needed to calculate derivative
 	double power_to_motors = 0;
 	
-	while (abs(error) > 1){
+	while (abs(error) > 0.8 || abs(derivative) > 0.5){
 		//Rotate using PID where the required angle is therefore greater than the current heading value
 		//Proportional - calculating the error
 		if (abs(angle - inertial.get_heading()) <= 180)
@@ -163,12 +165,12 @@ void robot_set_heading_PID(double angle)
 
 		// When we reach our target value, we need to reset our integral so that the robot
 		// doesn't overshoot
-		if (error < 0.2){
+		if (abs(error) < 0.2){
 			integral = 0;
 		}
 
 		// To prevent integral windup 
-		if (error > 20){
+		if (abs(error) > 10){
 			integral = 0;
 		}
 
@@ -179,11 +181,19 @@ void robot_set_heading_PID(double angle)
 		//Power = proportional + integral + derivative
 		power_to_motors = (kP * error) + (kI * integral)+ (kD * derivative);
 
+		if (power_to_motors >= -7 && power_to_motors < -1){
+			power_to_motors = -10;
+		}
+		else if(power_to_motors <= 7 && power_to_motors > 1){
+			power_to_motors = 10;
+		}	
+
 		left_motors.move(power_to_motors);
 		right_motors.move(-power_to_motors); //The right motors must spin the other way
 		
 		pros::delay(15); // This is essential for both integral and derivative.
 	}
+
 	left_motors.brake();
 	right_motors.brake();
 }
