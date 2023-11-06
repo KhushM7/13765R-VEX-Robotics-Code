@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "Test",
+    "project_name": "VexCode",
     "target": "v5",
     "templates": {
       "kernel": {
@@ -309,9 +309,9 @@
       }
     },
     "upload_options": {
-      "slot": 2,
-      "icon": "planet",
-      "description": "Testing purposes"
+      "slot": 1,
+      "icon": "clawbot",
+      "description": "General + competition"
     }
   }
 }
