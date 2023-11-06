@@ -13,7 +13,7 @@ void stop_robot();
 void robot_move_to(int speed, std::string sensor, double distance, bool should_slow_down);
 
 //Set the velocity of all the drive base motors.
-void robot_set_velocity(double speed);
+void robot_set_velocity(double speed, double milliseconds);
 
 void robot_moveTo_PID(std::string sensor, double distanceFromObject);
 #endif

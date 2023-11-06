@@ -59,9 +59,13 @@ void robot_move_to(int motor_speed, std::string sensor, double distance, bool sh
 	controller.print(0,0, "Done");		
 }
 
-void robot_set_velocity(double speed){
+void robot_set_velocity(double speed, double milliseconds){
 	left_motors.move_velocity(speed);
 	right_motors.move_velocity(speed);
+	double start_time = pros::millis();
+	while (pros::millis() <= start_time + milliseconds){
+		pros::delay(10);
+	}
 }
 
 //Moves the robot until it is at a specified location, using a PID controller
