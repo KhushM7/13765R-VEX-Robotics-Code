@@ -66,6 +66,8 @@ void robot_set_velocity(double speed, double milliseconds){
 	while (pros::millis() <= start_time + milliseconds){
 		pros::delay(10);
 	}
+	left_motors.brake();
+	right_motors.brake();
 }
 
 //Moves the robot until it is at a specified location, using a PID controller

@@ -19,40 +19,40 @@
 
 
 //Autonomous functions
-void auton_defensive(){
+void auton_defensive_1(){
 	robot_move_to(160, "BACK", 1300, true);
 	robot_set_heading(270);
-	intake.move_velocity(-200);
 
+	//get rid of the triball
+	intake.move_velocity(-200);
 	pros::delay(500);
 	intake.brake();
 
 	//Ram into triball
 	//Get away from base of goal
-	robot_move_to(100, "BACK", 0, false);
-	pros::delay(400);
+	robot_set_velocity(100, 400);
 
 	//Face triball with back of robot	
 	robot_set_heading(90);
 
 	//Ram into it
-	robot_move_to(160, "BACK", 0, false);
-	pros::delay(1000);
+	robot_set_velocity(160, 1000);
 
 	//Get away from base of goal again
-	robot_move_to(-160, "BACK", 0, false);
-	pros::delay(125);
+	robot_set_velocity(-160, 125);
 
 	//Go to bar
 	robot_set_heading(2);
 	robot_move_to(120, "BACK", 80, true);
 	robot_set_heading(90);
+
+	//Needs work
 	robot_move_to(120, "FRONT", 0, false);
 	pros::delay(1000);
 	stop_robot();
 }
 
-void auton_offensive(){
+void auton_offensive_1(){
 	//Get to goal
 	robot_move_to(160, "BACK", 1300, true);	
 	robot_set_heading(90);
@@ -63,19 +63,16 @@ void auton_offensive(){
 	intake.brake();
 
 	//Get away from goal to get some space.
-	robot_move_to(50, "BACK", 0, false);
-	pros::delay(400);	
+	robot_set_velocity(50, 400);
 
 	//Face preload triball with back of robot
 	robot_set_heading(270); 
 
 	//Ram into preload triball
-	robot_move_to(160, "BACK", 0, false);
-	pros::delay(1000);
+	robot_set_velocity(160, 1000);
 
 	//Get away from the goal
-	robot_move_to(-160, "BACK", 0, false);
-	pros::delay(125);
+	robot_set_velocity(-160, 125);
 
 	stop_robot();
 
@@ -163,8 +160,7 @@ void competition_initialize() {
  */
 void autonomous() {
 	pros::delay(2000);
-	auton_offensive();
-	
+	auton_offensive_1();
 }
 
 //Gets the hottest motor, printing a two character code that represents the motor
