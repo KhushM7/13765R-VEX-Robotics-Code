@@ -78,6 +78,40 @@ void auton_offensive_1(){
 
 }
 
+void auton_skills(){
+	//Initialise the inertial sensor	
+	inertial.reset(true);
+
+	//Start at 45 degree rotation for matchloading on top of matchbar
+	//We are facing wrong way due to the catapult being at the back so
+	//initial heading is 225 degrees instead.
+	inertial.set_heading(225); 
+
+	//We will catapult for 45 seconds roughly
+	//Insert catapulting code here
+	//Maybe intake corner triball and catapult that as well?
+
+	//After that we will drive forward until we have space to rotate
+	//I calculated that we drive forward 860mm roughly.
+	robot_moveTo_PID("Front", 860);
+	
+	//Now rotate to the centre
+	robot_set_heading_PID(0);
+
+	//Now move to align with centre of field
+	robot_moveTo_PID("BACK", 1270); //Rougly 1270 mm
+	
+	//Now rotate towards our goal, with our back facing the bar
+	robot_set_heading(270);
+
+	//Now open the wings and go forwards the whole way and ram into 
+	//triballs on other side to score them
+	wings.set_value(true);
+	robot_set_velocity(200, 20000);
+
+	//Done!
+}
+
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -271,6 +305,9 @@ void opcontrol() {
 	
 
 	while(true){
+		if (controller.get_digital(DIGITAL_B)){
+			auton_skills();
+		}
 		if (controller.get_analog(ANALOG_LEFT_Y) > 8 || controller.get_analog(ANALOG_LEFT_Y) < -8){
 			left_motors.move(controller.get_analog(ANALOG_LEFT_Y));			
 		}
