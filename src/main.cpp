@@ -167,9 +167,9 @@ void autonomous() {
 // E.g. BR for back right or I  for intake
 //After the motor code, it prints the temperature of that motor
 void display_hottest_motor(std::vector<pros::Motor> all_motors){
-	int highest_motor_temp = 0;
+	int highest_motor_temp = all_motors[0].get_temperature();
 	std::string hottest_motor = "";
-	for (int i = 0; i < all_motors.size(); i++){			
+	for (int i = 1; i < all_motors.size(); i++){			
 		if (all_motors[i].get_temperature() > highest_motor_temp){
 			highest_motor_temp = all_motors[i].get_temperature();
 			//Using order of motors when list was created
@@ -328,8 +328,8 @@ void opcontrol() {
 		}
 
 		if (controller.get_digital_new_press(DIGITAL_L2)){
-			catapult1.move_relative(360, 60);
-			catapult2.move_relative(360, 60);
+			catapult1.move_relative(1440, 100);
+			catapult2.move_relative(1440, 100);
 		}
 
 		//Displaying motor temperature stuff
