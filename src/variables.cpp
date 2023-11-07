@@ -24,3 +24,4 @@ pros::ADIDigitalOut wings('H');
 pros::Imu inertial(18);
 pros::Distance front_dist(21); //Not yet plugged in
 pros::Distance back_dist(20);
+pros::ADIDigitalIn catapult_switch('A');

@@ -17,6 +17,14 @@
 #include <vector>
 #include <atomic>
 
+//Catapult shoot for autonomous
+void catapult_shoot(){
+	//Change brake mode to reduce strain on motors
+	catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+	catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+
+	//Rotate the catapult until it hits
+}
 
 //Autonomous functions
 void auton_defensive_1(){
@@ -98,6 +106,17 @@ void initialize() {
 	// while(!pros::competition::is_autonomous()){
 	// 	pros::delay(5);
 	// }
+
+	//Lower catapult until it hits the bumper switch
+	while(catapult_switch.get_new_press()){
+		catapult1.move_velocity(60);
+		catapult2.move_voltage(60);
+		pros::delay(5);
+	}
+	catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	catapult1.brake();
+	catapult2.brake();
 }
 
 
@@ -268,6 +287,9 @@ void opcontrol() {
 	bool wingsAreOpen = false;
 	bool isClawDown = false;
 	bool isIntakeOff = true;
+
+	//To ensure catapult cannot be touched whilst its shooting
+	bool catapultIsMoving = true;
 	
 
 	while(true){
@@ -327,15 +349,41 @@ void opcontrol() {
 			}
 		}
 
-		if (controller.get_digital_new_press(DIGITAL_L2)){
-			catapult1.move_relative(1440, 100);
-			catapult2.move_relative(1440, 100);
+		if (controller.get_digital_new_press(DIGITAL_L2) && !catapultIsMoving){
+			catapultIsMoving = true;
+
+			//Change brake mode to reduce strain on motors
+			catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+			catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+
+			//Rotate the catapult so it stops hitting the bumper switch
+			catapult1.move_relative(360, 100);
+			catapult2.move_relative(360, 100);
+
+			//Just to ensure that the bumper switch is no longer being pressed
+			//pros::delay(80); 			
+		}
+
+		if (catapultIsMoving){
+			//Keep rotating catapult until
+			if (catapult_switch.get_value() == 0){
+				catapult1.move_velocity(100);
+				catapult2.move_velocity(100);
+			}
+			//Once we hit the bumper switch			
+			else {
+				catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+				catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+				catapult1.brake();
+				catapult2.brake();
+				catapultIsMoving = false;
+			}
 		}
 
 		//Displaying motor temperature stuff
 		display_hottest_motor(all_motors);
 		display_all_motor_temps(all_motors);
 
-		pros::delay(20);
+		pros::delay(10); //Refresh rate of a motor
 	}
 }

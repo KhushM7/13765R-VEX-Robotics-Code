@@ -25,4 +25,5 @@ extern pros::ADIDigitalOut wings;
 extern pros::Imu inertial;
 extern pros::Distance front_dist;
 extern pros::Distance back_dist;
+extern pros::ADIDigitalIn catapult_switch;
 #endif
