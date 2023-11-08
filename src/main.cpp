@@ -28,62 +28,110 @@ void catapult_shoot(){
 
 //Autonomous functions
 void auton_defensive_1(){
-	robot_move_to(160, "BACK", 1300, true);
-	robot_set_heading(270);
-
-	//get rid of the triball
-	intake.move_velocity(-200);
-	pros::delay(500);
-	intake.brake();
-
-	//Ram into triball
-	//Get away from base of goal
+	//Jerk intake down by going backward into wall
+	robot_set_velocity(-200, 1000);
 	robot_set_velocity(100, 400);
 
-	//Face triball with back of robot	
-	robot_set_heading(90);
+	//Move in front of goal
+	robot_moveTo_PID("BACK", 1200);
 
-	//Ram into it
-	robot_set_velocity(160, 1000);
+	//Get away from goal a bit
+	robot_set_heading_PID(270);
+	robot_set_velocity(100, 300);
 
-	//Get away from base of goal again
-	robot_set_velocity(-160, 125);
+	//Rotate intake to goal
+	robot_set_heading_PID(90);
 
-	//Go to bar
-	robot_set_heading(2);
-	robot_move_to(120, "BACK", 80, true);
-	robot_set_heading(90);
+	//get rid of the triball
+	intake.move_velocity(-600);
 
-	//Needs work
-	robot_move_to(120, "FRONT", 0, false);
-	pros::delay(1000);
-	stop_robot();
-}
-
-void auton_offensive_1(){
-	//Get to goal
-	robot_move_to(160, "BACK", 1300, true);	
-	robot_set_heading(90);
-
-	//Offload preloaded triball
-	intake.move_velocity(-200);
-	pros::delay(500);
+	//Get away from base of goal
+	robot_set_velocity(-100, 400);
 	intake.brake();
 
-	//Get away from goal to get some space.
-	robot_set_velocity(50, 400);
+	//Face triball with back of robot	
+	robot_set_heading_PID(270);
 
-	//Face preload triball with back of robot
-	robot_set_heading(270); 
+	//Ram into it
+	robot_set_velocity(-160, 500);
 
-	//Ram into preload triball
-	robot_set_velocity(160, 1000);
+	//Get away from base of goal again
+	robot_set_velocity(-150, 700);
 
-	//Get away from the goal
-	robot_set_velocity(-160, 125);
+	//Go back to matchload bar
+	robot_set_heading_PID(359);
+	robot_moveTo_PID("BACK", 200);
+}
 
-	stop_robot();
 
+void auton_offensive_1(){
+	//Jerk intake down by going backward into wall
+	robot_set_velocity(-200, 1000);
+	robot_set_velocity(100, 400);
+
+	//Move in front of goal
+	robot_moveTo_PID("BACK", 1200);
+
+	//Get away from goal a bit
+	robot_set_heading_PID(90);
+	robot_set_velocity(100, 300);
+
+	//Rotate intake to goal
+	robot_set_heading_PID(270);
+
+	//get rid of the triball
+	intake.move_velocity(-600);
+	
+	//Get away from base of goal
+	robot_set_velocity(-100, 400);
+	intake.brake();
+
+	//Face triball with back of robot	
+	robot_set_heading_PID(90);
+
+	//Ram into it
+	robot_set_velocity(-160, 500);
+
+	//Get away from base of goal again
+	robot_set_velocity(-150, 700);
+
+	//Go back to matchload bar
+	robot_set_heading_PID(359);
+	robot_moveTo_PID("BACK", 200);
+}
+
+void auton_skills(){
+	//Initialise the inertial sensor	
+	inertial.reset(true);
+
+	//Start at 45 degree rotation for matchloading on top of matchbar
+	//We are facing wrong way due to the catapult being at the back so
+	//initial heading is 225 degrees instead.
+	inertial.set_heading(225); 
+
+	//We will catapult for 45 seconds roughly
+	//Insert catapulting code here
+	//Maybe intake corner triball and catapult that as well?
+
+	//After that we will drive forward until we have space to rotate
+	//I calculated that we drive forward 860mm roughly.
+	robot_moveTo_PID("Front", 860);
+	
+	//Now rotate to the centre
+	robot_set_heading_PID(0);
+
+	//Now move to align with centre of field
+	robot_moveTo_PID("BACK", 1270); //Rougly 1270 mm
+	
+	//Now rotate towards our goal, with our back facing the bar
+	robot_set_heading(270);
+
+	//Now open the wings and go forwards the whole way and ram into 
+	//triballs on other side to score them
+	wings.set_value(true);
+	robot_set_velocity(200, 20000);
+
+	//Done!
 }
 
 /**
@@ -133,7 +181,8 @@ typedef enum{
 	DEFENSIVE,
 	SKILLS
 } autonStates;
-autonStates auton_state = OFFENSIVE;
+autonStates auton_state = SKILLS; //Default. 
+//Also may not be able to select auton during skills
 bool hasConfimed = false;
 
 /**
@@ -178,8 +227,15 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-	pros::delay(2000);
-	auton_offensive_1();
+	if (auton_state == OFFENSIVE){
+		auton_offensive_1();
+	}
+	else if (auton_state == DEFENSIVE){
+		auton_defensive_1();
+	}
+	else{
+		auton_skills();
+	}
 }
 
 //Gets the hottest motor, printing a two character code that represents the motor
