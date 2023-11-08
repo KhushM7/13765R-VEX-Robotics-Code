@@ -20,62 +20,76 @@
 
 //Autonomous functions
 void auton_defensive_1(){
-	robot_move_to(160, "BACK", 1300, true);
-	robot_set_heading(270);
-
-	//get rid of the triball
-	intake.move_velocity(-200);
-	pros::delay(500);
-	intake.brake();
-
-	//Ram into triball
-	//Get away from base of goal
+	//Jerk intake down by going backward into wall
+	robot_set_velocity(-200, 1000);
 	robot_set_velocity(100, 400);
 
+	//Move in front of goal
+	robot_moveTo_PID("BACK", 1200);
+
+	//Get away from goal a bit
+	robot_set_heading_PID(270);
+	robot_set_velocity(100, 300);
+
+	//Rotate intake to goal
+	robot_set_heading_PID(90);
+
+	//get rid of the triball
+	intake.move_velocity(-600);
+
+	//Get away from base of goal
+	robot_set_velocity(-100, 400);
+	intake.brake();
+
 	//Face triball with back of robot	
-	robot_set_heading(90);
+	robot_set_heading_PID(270);
 
 	//Ram into it
-	robot_set_velocity(160, 1000);
+	robot_set_velocity(-160, 500);
 
 	//Get away from base of goal again
-	robot_set_velocity(-160, 125);
+	robot_set_velocity(-150, 700);
 
-	//Go to bar
-	robot_set_heading(2);
-	robot_move_to(120, "BACK", 80, true);
-	robot_set_heading(90);
+	//Go back to matchload bar
+	robot_set_heading_PID(359);
+	robot_moveTo_PID("BACK", 200);
 
-	//Needs work
-	robot_move_to(120, "FRONT", 0, false);
-	pros::delay(1000);
-	stop_robot();
 }
 
 void auton_offensive_1(){
-	//Get to goal
-	robot_move_to(160, "BACK", 1300, true);	
-	robot_set_heading(90);
+	//Jerk intake down by going backward into wall
+	robot_set_velocity(-200, 1000);
+	robot_set_velocity(100, 400);
 
-	//Offload preloaded triball
-	intake.move_velocity(-200);
-	pros::delay(500);
+	//Move in front of goal
+	robot_moveTo_PID("BACK", 1200);
+
+	//Get away from goal a bit
+	robot_set_heading_PID(90);
+	robot_set_velocity(100, 300);
+
+	//Rotate intake to goal
+	robot_set_heading_PID(270);
+
+	//get rid of the triball
+	intake.move_velocity(-600);
+	
+	//Get away from base of goal
+	robot_set_velocity(-100, 400);
 	intake.brake();
 
-	//Get away from goal to get some space.
-	robot_set_velocity(50, 400);
+	//Face triball with back of robot	
+	robot_set_heading_PID(90);
 
-	//Face preload triball with back of robot
-	robot_set_heading(270); 
+	//Ram into it
+	robot_set_velocity(-160, 500);
 
-	//Ram into preload triball
-	robot_set_velocity(160, 1000);
+	//Get away from base of goal again
+	robot_set_velocity(-150, 700);
 
-	//Get away from the goal
-	robot_set_velocity(-160, 125);
-
-	stop_robot();
-
+	//Go back to matchload bar
+	robot_set_heading_PID(359);
+	robot_moveTo_PID("BACK", 200);
 }
 
 void auton_skills(){
@@ -306,7 +320,7 @@ void opcontrol() {
 
 	while(true){
 		if (controller.get_digital(DIGITAL_B)){
-			auton_skills();
+			auton_defensive_1();
 		}
 		if (controller.get_analog(ANALOG_LEFT_Y) > 8 || controller.get_analog(ANALOG_LEFT_Y) < -8){
 			left_motors.move(controller.get_analog(ANALOG_LEFT_Y));			
