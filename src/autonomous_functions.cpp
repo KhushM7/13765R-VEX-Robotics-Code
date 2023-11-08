@@ -62,10 +62,7 @@ void robot_move_to(int motor_speed, std::string sensor, double distance, bool sh
 void robot_set_velocity(double speed, double milliseconds){
 	left_motors.move_velocity(speed);
 	right_motors.move_velocity(speed);
-	double start_time = pros::millis();
-	while (pros::millis() <= start_time + milliseconds){
-		pros::delay(10);
-	}
+	pros::delay(milliseconds);
 	left_motors.brake();
 	right_motors.brake();
 }
@@ -75,7 +72,7 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject){
     //Let's define some variables that will be useful for PID
 	const double kP = 1.1;
 	const double kI = 0.;
-	const double kD = 0.6;
+	const double kD = 0.;
 
     double error = 0;
     double integral = 0;
