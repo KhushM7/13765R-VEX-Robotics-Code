@@ -195,7 +195,7 @@ bool hasConfimed = false;
  * starts.
  */
 void competition_initialize() {
-	while (!pros::competition::is_autonomous()){
+	while (!pros::competition::is_autonomous() && auton_switch.get_value() == 0){
 		if(pros::lcd::read_buttons() & LCD_BTN_LEFT){
 			//Set the auton to be offensive
 			auton_state = OFFENSIVE;
@@ -346,6 +346,7 @@ void opcontrol() {
 
 	//To ensure catapult cannot be touched whilst its shooting
 	bool catapultIsMoving = false;
+	bool hasLeftBumperSwitch = false;
 	
 
 	while(true){
@@ -411,23 +412,27 @@ void opcontrol() {
 			//Change brake mode to reduce strain on motors
 			catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 			catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-
-			//Rotate the catapult so it stops hitting the bumper switch
-			catapult1.move_relative(360, 100);
-			catapult2.move_relative(360, 100);
-
+			
+			hasLeftBumperSwitch = false;
 			//Just to ensure that the bumper switch is no longer being pressed
 			//pros::delay(80); 			
 		}
 
 		if (catapultIsMoving){
+			if (!hasLeftBumperSwitch){
+				catapult1.move_velocity(100);
+				catapult2.move_velocity(100);
+				if (catapult_switch.get_value() == 0){
+					hasLeftBumperSwitch = true;
+				}
+			}
 			//Keep rotating catapult until
-			if (catapult_switch.get_value() == 0){
+			else if (catapult_switch.get_value() == 0){
 				catapult1.move_velocity(100);
 				catapult2.move_velocity(100);
 			}
 			//Once we hit the bumper switch			
-			else {
+			else{
 				catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 				catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 				catapult1.brake();
