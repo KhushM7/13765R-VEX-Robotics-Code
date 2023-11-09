@@ -16,8 +16,8 @@ pros::Motor_Group left_motors({topLeft, bottomLeft});
 pros::Motor_Group right_motors({topRight, bottomRight});
 
 pros::Motor intake(8, MOTOR_GEAR_BLUE, false);
-pros::Motor catapult1(17, MOTOR_GEAR_RED, true);
-pros::Motor catapult2(2, pros::E_MOTOR_GEAR_RED);
+pros::Motor catapult1(17, MOTOR_GEAR_RED);
+pros::Motor catapult2(3, pros::E_MOTOR_GEAR_RED, true);
 pros::ADIDigitalOut wings('H');
 
 //Initialise sensors
