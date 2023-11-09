@@ -345,7 +345,7 @@ void opcontrol() {
 	bool isIntakeOff = true;
 
 	//To ensure catapult cannot be touched whilst its shooting
-	bool catapultIsMoving = true;
+	bool catapultIsMoving = false;
 	
 
 	while(true){
