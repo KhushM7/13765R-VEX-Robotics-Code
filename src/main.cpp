@@ -156,9 +156,9 @@ void initialize() {
 	// }
 
 	//Lower catapult until it hits the bumper switch
-	while(catapult_switch.get_new_press()){
+	while(catapult_switch.get_value() == 1){
 		catapult1.move_velocity(60);
-		catapult2.move_voltage(60);
+		catapult2.move_velocity(60);
 		pros::delay(5);
 	}
 	catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
