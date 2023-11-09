@@ -156,7 +156,7 @@ void initialize() {
 	// }
 
 	//Lower catapult until it hits the bumper switch
-	while(catapult_switch.get_value() == 1){
+	while(catapult_switch.get_value() == 0){
 		catapult1.move_velocity(60);
 		catapult2.move_velocity(60);
 		pros::delay(5);
