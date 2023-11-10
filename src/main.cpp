@@ -339,6 +339,9 @@ void opcontrol() {
 	
 
 	while(true){
+		if (controller.get_digital(DIGITAL_B)){
+			auton_skills();
+		}
 		if (controller.get_analog(ANALOG_LEFT_Y) > 8 || controller.get_analog(ANALOG_LEFT_Y) < -8){
 			left_motors.move(controller.get_analog(ANALOG_LEFT_Y));			
 		}
