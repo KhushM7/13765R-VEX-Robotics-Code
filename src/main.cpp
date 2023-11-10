@@ -428,8 +428,8 @@ void opcontrol() {
 			}
 			//Keep rotating catapult until
 			else if (catapult_switch.get_value() == 0){
-				catapult1.move_velocity(100);
-				catapult2.move_velocity(100);
+				catapult1.move_velocity(60);
+				catapult2.move_velocity(60);
 			}
 			//Once we hit the bumper switch			
 			else{
