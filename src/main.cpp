@@ -217,15 +217,7 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-	if (auton_state == OFFENSIVE){
-		auton_offensive_1();
-	}
-	else if (auton_state == DEFENSIVE){
-		auton_defensive_1();
-	}
-	else{
-		auton_skills();
-	}
+	auton_defensive_1();
 }
 
 //Gets the hottest motor, printing a two character code that represents the motor
