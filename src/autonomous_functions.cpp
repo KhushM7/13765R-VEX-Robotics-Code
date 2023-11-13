@@ -68,7 +68,7 @@ void robot_set_velocity(double speed, double milliseconds){
 }
 
 //Moves the robot until it is at a specified location, using a PID controller
-void robot_moveTo_PID(std::string sensor, double distanceFromObject){
+void robot_moveTo_PID(std::string sensor, double distanceFromObject, bool profiledMotion ){
     //Let's define some variables that will be useful for PID
 	const double kP = 1.1;
 	const double kI = 0.;
@@ -78,7 +78,10 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject){
     double integral = 0;
     double derivative = 0;
     double prevError;
-    double power_to_motors;
+    double power_to_motors = 0;
+
+	//This is used for slowly "ramping up" the power
+	double prev_power_to_motors = 0;
 
 	if (sensor == "BACK"){
 		prevError = back_dist.get(); //Necessary to stop program giving undefined errors
@@ -93,7 +96,7 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject){
 	error = prevError;
 
 	// Keep doing PID loop until the robot is within 5mm of the desired value
-	while (abs(error) > 10 || derivative >  0.05){
+	while (abs(error) > 10 || derivative >  0.1){
 		//Proportional - calculating error
 		
 		if (sensor == "BACK"){
@@ -120,9 +123,14 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject){
 
 		power_to_motors = (kP * error) + (kI * integral) + (kD * derivative);
 
+		//Max change of power from 0 to 10V in one from 
+		if (profiledMotion && power_to_motors - prev_power_to_motors > 10){
+			power_to_motors = prev_power_to_motors + 10;
+		}
+
 		left_motors = power_to_motors;
 		right_motors = power_to_motors;
-
+		prev_power_to_motors = power_to_motors;
 		pros::delay(20); //Essential for both integral and derivative
     }
 	stop_robot();
