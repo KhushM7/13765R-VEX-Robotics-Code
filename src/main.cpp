@@ -144,10 +144,11 @@ void initialize() {
 	// 	pros::delay(5);
 	// }
 
+	double initialTime = pros::millis();
 	//Lower catapult until it hits the bumper switch
-	while(catapult_switch.get_value() == 0){
-		catapult1.move_velocity(60);
-		catapult2.move_velocity(60);
+	while(catapult_switch.get_value() == 0 && pros::millis() <= initialTime + 2000){
+		catapult1.move_velocity(50);
+		catapult2.move_velocity(50);
 		pros::delay(5);
 	}
 	catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
