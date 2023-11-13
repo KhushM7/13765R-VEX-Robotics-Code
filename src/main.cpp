@@ -20,76 +20,26 @@
 
 //Autonomous functions
 void auton_defensive_1(){
-	//Jerk intake down by going backward into wall
-	robot_set_velocity(-200, 1000);
-	robot_set_velocity(100, 400);
+	//Robot starts at a heading of 240 degrees
+	inertial.set_heading(240);
 
-	//Move in front of goal
-	robot_moveTo_PID("BACK", 1200);
+	//We drive back for a while until we score triball
+	robot_set_velocity(-200, 2000);
 
-	//Get away from goal a bit
-	robot_set_heading_PID(270);
-	robot_set_velocity(100, 300);
-
-	//Rotate intake to goal
-	robot_set_heading_PID(90);
-
-	//get rid of the triball
-	intake.move_velocity(-600);
-
-	//Get away from base of goal
-	robot_set_velocity(-100, 400);
-	intake.brake();
-
-	//Face triball with back of robot	
-	robot_set_heading_PID(270);
-
-	//Ram into it
-	robot_set_velocity(-160, 500);
-
-	//Get away from base of goal again
-	robot_set_velocity(-150, 700);
-
-	//Go back to matchload bar
-	robot_set_heading_PID(359);
-	robot_moveTo_PID("BACK", 200);
+	//Face the corner
+	robot_set_heading_PID(180);
 }
 
 
 void auton_offensive_1(){
-	//Jerk intake down by going backward into wall
-	robot_set_velocity(-200, 1000);
-	robot_set_velocity(100, 400);
+	//Robot starts at a heading of 240 degrees
+	inertial.set_heading(120);
 
-	//Move in front of goal
-	robot_moveTo_PID("BACK", 1200);
+	//We drive back for a while until we score triball
+	robot_set_velocity(-200, 2000);
 
-	//Get away from goal a bit
-	robot_set_heading_PID(90);
-	robot_set_velocity(100, 300);
-
-	//Rotate intake to goal
-	robot_set_heading_PID(270);
-
-	//get rid of the triball
-	intake.move_velocity(-600);
-	
-	//Get away from base of goal
-	robot_set_velocity(-100, 400);
-	intake.brake();
-
-	//Face triball with back of robot	
-	robot_set_heading_PID(90);
-
-	//Ram into it
-	robot_set_velocity(-160, 500);
-
-	//Get away from base of goal again
-	robot_set_velocity(-150, 700);
-
-	//Go back to matchload bar
-	robot_set_heading_PID(359);
-	robot_moveTo_PID("BACK", 200);
+	//Face the corner
+	robot_set_heading_PID(180);
 }
 
 void auton_skills(){
@@ -136,13 +86,6 @@ void initialize() {
 	}
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
-
-	// This loop keeps running until autonomous starts. 
-	// Whilst the loop automatically exits upon start of the auton period,
-	// we want to be double sure this is the case
-	// while(!pros::competition::is_autonomous()){
-	// 	pros::delay(5);
-	// }
 
 	double initialTime = pros::millis();
 	//Lower catapult until it hits the bumper switch
