@@ -123,7 +123,7 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject, bool profil
 
 		power_to_motors = (kP * error) + (kI * integral) + (kD * derivative);
 
-		//Max change of power from 0 to 10V in one from 
+		//Max change of power from 0 to 10V in 20 msec
 		if (profiledMotion && power_to_motors - prev_power_to_motors > 10){
 			power_to_motors = prev_power_to_motors + 10;
 		}

@@ -20,20 +20,64 @@
 
 //Autonomous functions
 void auton_defensive_1(){
-	//Robot starts at a heading of 240 degrees
-	inertial.set_heading(240);
+	//Robot starts at a heading of 45 degrees
+	inertial.set_heading(315);
 
-	//We drive back for a while until we score triball
-	robot_set_velocity(-200, 2000);
+	intake.move_velocity(400);
+	
 
-	//Face the corner
+	//Lower intake
+	catapult1.move_velocity(100);
+	catapult2.move_velocity(100);
+	pros::delay(1000);
+	catapult1.brake();
+	catapult2.brake();
+
+	//Get triball out of corner
+	robot_set_velocity(125, 400);
+
+	wings.set_value(true);
+
+	robot_set_velocity(-100, 1000);
+	wings.set_value(false);
+
+	//Scoring alliance triball
+	//Go forward to give some space to rotate
+	robot_set_velocity(40, 500);
+	robot_set_heading_PID(340);
+
+	//Get rid of triball if it went into intake
+	intake.move_velocity(-600);
+	pros::delay(1200);
+	intake.brake();
+
+	//GO in front of bar
+	robot_set_heading_PID(130);
+	robot_set_velocity(-200, 1000);
+
+	//Rotate back of robot to triball and score it
 	robot_set_heading_PID(180);
+	//Back up
+	robot_set_velocity(100, 500);
+	//Ram into triball
+	robot_set_velocity(-200, 1000);
+
+	//GO to EV bar
+	robot_set_velocity(-100, 500);
+	robot_set_heading_PID(135);
+	robot_set_velocity(200, 1000);
+
+	robot_set_heading_PID(90);
+	intake.move_velocity(-600);
+
+	robot_moveTo_PID("BACK", 1500);
+
 }
 
 
 void auton_offensive_1(){
-	//Robot starts at a heading of 240 degrees
-	inertial.set_heading(120);
+	//Robot starts at a heading of 210 degrees
+	inertial.set_heading(210);
 
 	//We drive back for a while until we score triball
 	robot_set_velocity(-200, 2000);
@@ -87,13 +131,6 @@ void initialize() {
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
 
-	double initialTime = pros::millis();
-	//Lower catapult until it hits the bumper switch
-	while(catapult_switch.get_value() == 0 && pros::millis() <= initialTime + 2000){
-		catapult1.move_velocity(50);
-		catapult2.move_velocity(50);
-		pros::delay(5);
-	}
 	catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	catapult1.brake();
