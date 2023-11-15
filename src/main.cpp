@@ -51,26 +51,30 @@ void auton_defensive_1(){
 	pros::delay(1200);
 	intake.brake();
 
-	//GO in front of bar
+	//GO in front of goal
+
+	//Get some space
+	robot_set_velocity(150, 100);
 	robot_set_heading_PID(130);
-	robot_set_velocity(-200, 1000);
+	robot_set_velocity(-110, 1200);
 
 	//Rotate back of robot to triball and score it
 	robot_set_heading_PID(180);
-	//Back up
-	robot_set_velocity(100, 500);
 	//Ram into triball
-	robot_set_velocity(-200, 1000);
+	robot_set_velocity(-200, 750);
 
 	//GO to EV bar
-	robot_set_velocity(-100, 500);
+	robot_set_velocity(-100, 300);
 	robot_set_heading_PID(135);
-	robot_set_velocity(200, 1000);
+	robot_set_velocity(100, 1300);
+
+	robot_set_heading_PID(100);
+	robot_set_velocity(120, 500);
 
 	robot_set_heading_PID(90);
 	intake.move_velocity(-600);
 
-	robot_moveTo_PID("BACK", 1500);
+	robot_moveTo_PID("BACK", 1350);
 
 }
 
