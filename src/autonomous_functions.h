@@ -10,7 +10,7 @@ void stop_robot();
  * NOTE: parameter sensor must either be BACK or FRONT
  * NOTE: parameter speed must be in rpm
  */ 
-void robot_move_to(int speed, std::string sensor, double distance, bool should_slow_down);
+void robot_move_to(int speed, std::string sensor, double distance, bool should_slow_down = true);
 
 //Set the velocity of all the drive base motors.
 void robot_set_velocity(double speed, double milliseconds);

@@ -11,7 +11,6 @@ void robot_move_to(int motor_speed, std::string sensor, double distance, bool sh
 
 	if (sensor == "BACK"){
 		error = distance - back_dist.get();
-		controller.print(0,0, "%d", error);
 		if (error < 0){
 			motor_speed *= -1;
 		}		
@@ -23,7 +22,6 @@ void robot_move_to(int motor_speed, std::string sensor, double distance, bool sh
 		controller.print(2,0, "Enter the correct sensor parameter");
 		controller.rumble(".......");
 	}
-	controller.print(0,0, "%d", motor_speed);
 
 	// Moves the motors forwards
 	left_motors.move_velocity(motor_speed);
@@ -55,8 +53,7 @@ void robot_move_to(int motor_speed, std::string sensor, double distance, bool sh
 
 	//Stop the motors
 	left_motors.brake();
-	right_motors.brake();
-	controller.print(0,0, "Done");		
+	right_motors.brake();	
 }
 
 void robot_set_velocity(double speed, double milliseconds){
@@ -72,7 +69,7 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject, bool profil
     //Let's define some variables that will be useful for PID
 	const double kP = 1.1;
 	const double kI = 0.;
-	const double kD = 0.;
+	const double kD = 0.35;
 
     double error = 0;
     double integral = 0;
@@ -96,7 +93,7 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject, bool profil
 	error = prevError;
 
 	// Keep doing PID loop until the robot is within 5mm of the desired value
-	while (abs(error) > 10 || derivative >  0.1){
+	while (abs(error) > 10 || derivative >  3){
 		//Proportional - calculating error
 		
 		if (sensor == "BACK"){
@@ -133,7 +130,16 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject, bool profil
 		prev_power_to_motors = power_to_motors;
 		pros::delay(20); //Essential for both integral and derivative
     }
+	
 	stop_robot();
+	pros::delay(1000);
+	if (sensor == "BACK"){
+			error = distanceFromObject - back_dist.get(); 
+		}
+	else if (sensor == "FRONT"){
+			error = distanceFromObject - front_dist.get();
+		}
+	controller.print(0, 0, "%F", error);
 }
 
 // Turns the robot until it has rotated to the specified angle.
