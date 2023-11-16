@@ -44,11 +44,12 @@ void auton_defensive_1(){
 	//Scoring alliance triball
 	//Go forward to give some space to rotate
 	robot_set_velocity(40, 500);
-	robot_set_heading_PID(340);
+	robot_set_heading_PID(350);
 
 	//Get rid of triball if it went into intake
 	intake.move_velocity(-600);
-	pros::delay(1200);
+	robot_set_velocity(-30, 500);
+	pros::delay(500);
 	intake.brake();
 
 	//GO in front of goal
@@ -74,49 +75,93 @@ void auton_defensive_1(){
 	robot_set_heading_PID(90);
 	intake.move_velocity(-600);
 
-	robot_moveTo_PID("BACK", 1350);
+	robot_move_to(120, "BACK", 1350);
 
 }
 
 
 void auton_offensive_1(){
-	//Robot starts at a heading of 210 degrees
-	inertial.set_heading(210);
+	//Robot starts at a heading of 225 degrees
+	inertial.set_heading(225);
 
-	//We drive back for a while until we score triball
-	robot_set_velocity(-200, 2000);
+	//Open wings and drive back to remove corner triball
+	wings.set_value(true);
+	robot_set_velocity(-200, 400);
+	
 
-	//Face the corner
+	//Turn to score triballs
 	robot_set_heading_PID(180);
+
+	//Ram into triballs
+	robot_set_velocity(-200, 800);
+	wings.set_value(false);
+
+	//Go back a bit and ram into them again
+	robot_set_velocity(-100, 400);
+	robot_set_velocity(-200, 400);
+
+	//Go to EV bar
+	robot_set_velocity(100, 200);
+	robot_set_heading_PID(225);
+	robot_set_velocity(100, 1350);
+	robot_set_heading_PID(260);
+	robot_set_velocity(100, 300);
+	robot_set_heading_PID(270);
+
+	//Now we're in front of the goal!
+	//Get the triball
+	intake.move_velocity(600);
+	robot_move_to(100, "BACK", 1420);
+
+
 }
 
 void auton_skills(){
 	//Initialise the inertial sensor
-	bool isCataDown = true;
+	inertial.reset(true);
+	//Start at a heading of 240!
+	inertial.set_heading(120);
+	bool isCataDown = false;
 
 	//We will catapult for 45 seconds roughly
-	//Insert catapulting code here
-	while (pros::millis() < 60000){
-		if (isCataDown){
-			catapult1.brake();
-			catapult2.brake();
-			pros::delay(1000);
-			isCataDown = false;
-			catapult1.move_velocity(100);
-			catapult2.move_velocity(100);
-			pros::delay(400);
-		}
-		else {
-			if (catapult_switch.get_value() == 0){
-				catapult1.move_velocity(60);
-				catapult2.move_velocity(60);
-			}
-			else{
-				isCataDown = true;
-			}		
-		}
-	}
-	
+	// while (pros::millis() < 45000){
+	// 	if (isCataDown){
+	// 		catapult1.brake();
+	// 		catapult2.brake();
+	// 		pros::delay(1000);
+	// 		isCataDown = false;
+	// 		catapult1.move_velocity(100);
+	// 		catapult2.move_velocity(100);
+	// 		pros::delay(400);
+	// 	}
+	// 	else {
+	// 		if (catapult_switch.get_value() == 0){
+	// 			catapult1.move_velocity(60);
+	// 			catapult2.move_velocity(60);
+	// 		}
+	// 		else{
+	// 			isCataDown = true;
+	// 		}		
+	// 	}
+	// }
+
+	//Move towards centre of field
+	robot_move_to(-200, "FRONT", 1050);
+	robot_set_heading_PID(180);
+	robot_move_to(200,"FRONT", 1500);
+	robot_set_heading_PID(90);
+
+	//Open wings
+	wings.set_value(true);
+	//Wiggle robot to get over bar
+	robot_set_velocity(-200, 3000);
+	robot_set_velocity(-200, 600);
+	//And now score the triballs as well
+	robot_set_velocity(-200, 3000);
+
+	//Ram back and score triballs one last time
+	robot_set_velocity(200, 400);
+	robot_set_velocity(-200, 1000);	
 
 	//Done!
 }
@@ -201,7 +246,7 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-	auton_defensive_1();
+	auton_skills();
 }
 
 //Gets the hottest motor, printing a two character code that represents the motor
@@ -379,9 +424,7 @@ void opcontrol() {
 			catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 			catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 			
-			hasLeftBumperSwitch = false;
-			//Just to ensure that the bumper switch is no longer being pressed
-			//pros::delay(80); 			
+			hasLeftBumperSwitch = false;	
 		}
 
 		if (catapultIsMoving){
