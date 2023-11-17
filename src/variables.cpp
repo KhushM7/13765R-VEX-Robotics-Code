@@ -18,11 +18,12 @@ pros::Motor_Group right_motors({topRight, bottomRight});
 pros::Motor intake(8, MOTOR_GEAR_BLUE, false);
 pros::Motor catapult1(17, MOTOR_GEAR_RED, true);
 pros::Motor catapult2(2, pros::E_MOTOR_GEAR_RED);
+pros::Motor hang(10);
 pros::ADIDigitalOut wings('H');
 
 //Initialise sensors
 pros::Imu inertial(18);
-pros::Distance front_dist(21); //Not yet plugged in
+pros::Distance front_dist(1);
 pros::Distance back_dist(20);
 pros::ADIDigitalIn catapult_switch('A');
 pros::ADIDigitalIn auton_switch('B');

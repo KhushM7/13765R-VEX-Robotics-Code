@@ -2,6 +2,7 @@
 //This is considered good practice therefore
 #include "main.h"
 #include "pros/adi.hpp"
+#include "pros/motors.hpp"
 #include "pros/rotation.hpp"
 #ifndef VARIABLES_H
 #define VARIABLES_H
@@ -19,6 +20,7 @@ extern pros::Motor_Group right_motors;
 extern pros::Motor intake;
 extern pros::Motor catapult1;
 extern pros::Motor catapult2;
+extern pros::Motor hang;
 extern pros::ADIDigitalOut wings;
 
 //Initialise sensors
