@@ -7,7 +7,11 @@
 void robot_move_to(int motor_speed, std::string sensor, double distance, bool should_slow_down){
 	// If a distance is not specified, the robot will continue the move forwards
 	double error; //distance away from target
+	double PI = 3.141592654;
 	int initialMaxMotorSpeed = motor_speed;
+	//Using backleft motor encoder position for distance for now
+	double prevBLMotorPosition = bottomLeft.get_position();
+	int current_speed = 0;
 
 	if (sensor == "BACK"){
 		error = distance - back_dist.get();
@@ -18,14 +22,23 @@ void robot_move_to(int motor_speed, std::string sensor, double distance, bool sh
 	else if (sensor == "FRONT") {
 		error = distance - front_dist.get();		
 	}
+	// else if (sensor == "WHEELS"){
+	// 	error = distance;
+	// }
 	else {
 		controller.print(2,0, "Enter the correct sensor parameter");
 		controller.rumble(".......");
 	}
 
 	// Moves the motors forwards
-	left_motors.move_velocity(motor_speed);
-	right_motors.move_velocity(motor_speed);
+	if (motor_speed - current_speed > 20){
+		current_speed += (motor_speed - current_speed) * 0.1;
+	}
+	else if (current_speed - motor_speed < -20){
+		current_speed += (current_speed - motor_speed) * 0.1;
+	}
+	left_motors.move_velocity( current_speed);
+	right_motors.move_velocity(current_speed);
 	
 	while (error >=  5 || error <= -5){
 		if (sensor == "BACK"){
@@ -34,6 +47,15 @@ void robot_move_to(int motor_speed, std::string sensor, double distance, bool sh
 		else if (sensor == "FRONT"){
 			error = distance - front_dist.get();
 		}
+		// else if (sensor == "WHEELS"){
+		// 	// error = Pi * diameter of wheel * theta/360
+		// 	error -= 100 * PI * ((bottomLeft.get_position()- prevBLMotorPosition)/360);
+		// 	controller.print(0, 0, "%F", error);
+		// 	prevBLMotorPosition = bottomLeft.get_position();
+		// 	if (error < 0){
+		// 		error = 0;
+		// 	}
+		// }
 		if (abs(error) < 300 && should_slow_down){
 			// Slow down the motor once it gets within the range of 300 mm
 			// This is only good when travelling longer distances
@@ -46,8 +68,16 @@ void robot_move_to(int motor_speed, std::string sensor, double distance, bool sh
 				motor_speed = initialMaxMotorSpeed;
 			}
 		}
-		left_motors.move_velocity(motor_speed);
-		right_motors.move_velocity(motor_speed);
+		else if (abs(error) > 300 && current_speed < motor_speed){
+			if (motor_speed - current_speed > 20){
+				current_speed += (motor_speed - current_speed) * 0.1;
+			}
+			else if (current_speed - motor_speed < -20){
+				current_speed += (current_speed - motor_speed) * 0.1;
+			}
+		}
+		left_motors.move_velocity(current_speed);
+		right_motors.move_velocity(current_speed);
 		pros::delay(20);		
 	}
 

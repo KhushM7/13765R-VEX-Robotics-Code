@@ -34,43 +34,37 @@ void auton_defensive_1(){
 	catapult2.brake();
 
 	//Get triball out of corner
-	robot_set_velocity(125, 400);
+	robot_set_velocity(40, 1000);
 
 	wings.set_value(true);
-
-	robot_set_velocity(-100, 1000);
+	pros::delay(300);
+	robot_set_velocity(-120, 700);
 	wings.set_value(false);
 
-	//Scoring alliance triball
-	//Go forward to give some space to rotate
-	robot_set_velocity(40, 500);
-	robot_set_heading_PID(350);
+	// //Scoring alliance triball
+	// //Get space + rotate to goal
+	// robot_set_heading_PID(340);
 
-	//Get rid of triball if it went into intake
-	intake.move_velocity(-600);
-	robot_set_velocity(-30, 500);
-	pros::delay(500);
-	intake.brake();
+	// //Get rid of triball if it went into intake
+	// intake.move_velocity(-600);
+	// robot_set_velocity(300, 500);
+	// pros::delay(500);
+	// intake.brake();
 
-	//GO in front of goal
+	// //GO in front of goal
 
-	//Get some space
-	robot_set_velocity(150, 100);
-	robot_set_heading_PID(130);
-	robot_set_velocity(-110, 1200);
+	// //Get some space
+	// robot_set_heading_PID(180);
+	// //Ram into triball
+	// robot_set_velocity(-200, 750);
 
-	//Rotate back of robot to triball and score it
-	robot_set_heading_PID(180);
-	//Ram into triball
-	robot_set_velocity(-200, 750);
+	// //GO to EV bar
+	// robot_set_velocity(150, 150);
+	// robot_set_heading_PID(145);
+	// robot_set_velocity(125, 1300);
 
-	//GO to EV bar
-	robot_set_velocity(-100, 300);
-	robot_set_heading_PID(135);
-	robot_set_velocity(100, 1300);
-
-	robot_set_heading_PID(100);
-	robot_set_velocity(120, 500);
+	// robot_set_heading_PID(100);
+	// robot_set_velocity(160, 350);
 
 	robot_set_heading_PID(90);
 	intake.move_velocity(-600);
@@ -87,14 +81,16 @@ void auton_offensive_1(){
 	//Open wings and drive back to remove corner triball
 	wings.set_value(true);
 	robot_set_velocity(-200, 400);
+	wings.set_value(false);
 	
+
+	//Bang into wall
+	robot_set_velocity(-200, 800);
 
 	//Turn to score triballs
 	robot_set_heading_PID(180);
-
-	//Ram into triballs
+	//Score em
 	robot_set_velocity(-200, 800);
-	wings.set_value(false);
 
 	//Go back a bit and ram into them again
 	robot_set_velocity(-100, 400);
@@ -146,16 +142,23 @@ void auton_skills(){
 	// }
 
 	//Move towards centre of field
-	robot_move_to(-200, "FRONT", 1050);
-	robot_set_heading_PID(180);
-	robot_move_to(200,"FRONT", 1500);
+	robot_set_velocity(-200, 300);
+	robot_set_heading_PID(0);
+	pros::delay(400); //Allow robot to fully stop
+	robot_move_to(150,"BACK", 1500);
 	robot_set_heading_PID(90);
 
 	//Open wings
 	wings.set_value(true);
 	//Wiggle robot to get over bar
-	robot_set_velocity(-200, 3000);
-	robot_set_velocity(-200, 600);
+	left_motors.move_velocity(-200);
+	right_motors.move_velocity(-200);
+	while (inertial.get_roll() < 20){
+		pros::delay(5);
+	}
+	stop_robot();
+	pros::delay(500);	
+	robot_set_velocity(-70, 1000);
 	//And now score the triballs as well
 	robot_set_velocity(-200, 3000);
 
@@ -246,7 +249,7 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-	auton_skills();
+	auton_defensive_1();
 }
 
 //Gets the hottest motor, printing a two character code that represents the motor
@@ -337,7 +340,7 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	
+	hang.set_zero_position(hang.get_position());
 	std::vector<pros::Motor> all_motors = 
 	{bottomLeft,
 	 bottomRight,
@@ -354,6 +357,7 @@ void opcontrol() {
 	bool wingsAreOpen = false;
 	bool isClawDown = false;
 	bool isIntakeOff = true;
+	bool hangIsDown = false;
 
 	//To ensure catapult cannot be touched whilst its shooting
 	bool catapultIsMoving = false;
@@ -417,6 +421,18 @@ void opcontrol() {
 			}
 		}
 
+		//Hang
+		if (controller.get_digital_new_press(DIGITAL_DOWN)){
+			if (hangIsDown){
+				hang.move_absolute(0, 80);
+				hangIsDown = false;
+			}
+			else{
+				hang.move_absolute(-360, 80);
+				hangIsDown = true;
+			}
+		}
+
 		if (controller.get_digital_new_press(DIGITAL_L2) && !catapultIsMoving){
 			catapultIsMoving = true;
 
@@ -426,6 +442,8 @@ void opcontrol() {
 			
 			hasLeftBumperSwitch = false;	
 		}
+
+		
 
 		if (catapultIsMoving){
 			if (!hasLeftBumperSwitch){

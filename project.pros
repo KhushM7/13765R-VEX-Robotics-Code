@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "VexCode",
+    "project_name": "Defensive",
     "target": "v5",
     "templates": {
       "kernel": {
