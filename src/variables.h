@@ -21,6 +21,7 @@ extern pros::Motor intake;
 extern pros::Motor catapult1;
 extern pros::Motor catapult2;
 extern pros::Motor hang;
+extern pros::Motor flywheel;
 extern pros::ADIDigitalOut wings;
 
 //Initialise sensors

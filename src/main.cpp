@@ -358,9 +358,10 @@ void opcontrol() {
 	bool isClawDown = false;
 	bool isIntakeOff = true;
 	bool hangIsDown = false;
+	bool catapultIsMoving = false;
 
 	//To ensure catapult cannot be touched whilst its shooting
-	bool catapultIsMoving = false;
+	bool flywheelIsMoving = false;
 	bool hasLeftBumperSwitch = false;
 	
 
@@ -421,16 +422,24 @@ void opcontrol() {
 			}
 		}
 
-		//Hang
-		if (controller.get_digital_new_press(DIGITAL_DOWN)){
-			if (hangIsDown){
-				hang.move_absolute(0, 80);
-				hangIsDown = false;
+		//Flywheel
+		if (controller.get_digital_new_press(DIGITAL_A)){
+			if (flywheelIsMoving){
+				//Stop flywheel
+				flywheel.brake();
+				isIntakeOff = false;
 			}
 			else{
-				hang.move_absolute(-360, 80);
-				hangIsDown = true;
+				//Make flywheel spin at 70%
+				flywheel.move_velocity(420);
+				isIntakeOff = true;
 			}
+		}
+
+		//cata go up
+		if (controller.get_digital_new_press(DIGITAL_DOWN)){
+			catapult1.move_relative(-360, -100);
+			catapult2.move_relative(-360, -100);
 		}
 
 		if (controller.get_digital_new_press(DIGITAL_L2) && !catapultIsMoving){
