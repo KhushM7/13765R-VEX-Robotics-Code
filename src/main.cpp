@@ -29,42 +29,42 @@ void auton_defensive_1(){
 	//Lower intake
 	catapult1.move_velocity(100);
 	catapult2.move_velocity(100);
-	pros::delay(1000);
+	pros::delay(700);
 	catapult1.brake();
 	catapult2.brake();
 
 	//Get triball out of corner
-	robot_set_velocity(40, 1000);
+	robot_set_velocity(80, 600);
 
 	wings.set_value(true);
 	pros::delay(300);
 	robot_set_velocity(-120, 700);
 	wings.set_value(false);
 
-	// //Scoring alliance triball
-	// //Get space + rotate to goal
-	// robot_set_heading_PID(340);
+	//Scoring alliance triball
+	//Get space + rotate to goal
+	robot_set_heading_PID(340);
 
-	// //Get rid of triball if it went into intake
-	// intake.move_velocity(-600);
-	// robot_set_velocity(300, 500);
-	// pros::delay(500);
-	// intake.brake();
+	//Get rid of triball if it went into intake and move
+	// forward to score
+	intake.move_velocity(-600);
+	robot_set_velocity(300, 1000);
+	intake.brake();
 
-	// //GO in front of goal
+	//GO in front of goal
 
-	// //Get some space
-	// robot_set_heading_PID(180);
-	// //Ram into triball
-	// robot_set_velocity(-200, 750);
+	//Get some space
+	robot_set_velocity(-80, 500);
+	//Ram into triballs
+	robot_set_velocity(200, 750);
 
-	// //GO to EV bar
-	// robot_set_velocity(150, 150);
-	// robot_set_heading_PID(145);
-	// robot_set_velocity(125, 1300);
+	//GO to EV bar
+	robot_set_velocity(-150, 150);
+	robot_set_heading_PID(145);
+	robot_set_velocity(125, 1300);
 
-	// robot_set_heading_PID(100);
-	// robot_set_velocity(160, 350);
+	robot_set_heading_PID(100);
+	robot_set_velocity(160, 350);
 
 	robot_set_heading_PID(90);
 	intake.move_velocity(-600);
@@ -340,7 +340,6 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	hang.set_zero_position(hang.get_position());
 	std::vector<pros::Motor> all_motors = 
 	{bottomLeft,
 	 bottomRight,
