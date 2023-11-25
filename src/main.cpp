@@ -43,33 +43,41 @@ void auton_defensive_1(){
 
 	//Scoring alliance triball
 	//Get space + rotate to goal
-	robot_set_heading_PID(340);
+	robot_set_heading_PID(330);
 
-	//Get rid of triball if it went into intake and move
-	// forward to score
+	//Get rid of triball if it went into intake whilst 
+	//moving forward to get close to goal
 	intake.move_velocity(-600);
-	robot_set_velocity(300, 1000);
+	robot_set_velocity(300, 800);
 	intake.brake();
 
-	//GO in front of goal
+	//rotate back of robot to goal to avoid SG9
+	robot_set_heading_PID(150);
+	//ram into triballs now
+	robot_set_velocity(-200, 500);
 
 	//Get some space
-	robot_set_velocity(-80, 500);
-	//Ram into triballs
-	robot_set_velocity(200, 750);
+	robot_set_velocity(100, 400);
+	//Ram into triballs again
+	robot_set_velocity(-200, 750);
 
 	//GO to EV bar
-	robot_set_velocity(-150, 150);
+	//Get away from goal
+	robot_set_velocity(150, 150);
+
+	//Rotate and drive in front of EV bar
 	robot_set_heading_PID(145);
 	robot_set_velocity(125, 1300);
 
+	//Manouver so that we can drive right under the EV bar
 	robot_set_heading_PID(100);
 	robot_set_velocity(160, 350);
 
 	robot_set_heading_PID(90);
 	intake.move_velocity(-600);
 
-	robot_move_to(120, "BACK", 1350);
+	//Drive under EV bar
+	robot_move_to(120, "BACK", 1400);
 
 }
 
