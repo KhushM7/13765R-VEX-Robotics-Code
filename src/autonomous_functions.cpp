@@ -245,33 +245,6 @@ void robot_set_heading_PID(double angle)
 	right_motors.brake();
 }
 
-void robot_set_heading(double angle){	
-	double error;
-	
-	do {
-		//Decide direction
-		if (abs(angle - inertial.get_heading()) <= 180)
-		{
-			error = angle - inertial.get_heading();
-		}
-
-		else
-		{
-			if (inertial.get_heading() > angle)
-			{
-				error = 360 + angle - inertial.get_heading();
-			}
-			else
-			{
-				error =  angle - inertial.get_heading() - 360;
-			}
-		}
-		//Keep rotating till you reach target
-		left_motors.move(error);
-		right_motors.move(-error);
-	} while ((error > 0.5 || error < -0.5));
-}
-
 void stop_robot(){
 	left_motors.brake();
 	right_motors.brake();
