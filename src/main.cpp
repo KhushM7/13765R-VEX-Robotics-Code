@@ -29,7 +29,7 @@ void auton_defensive_1(){
 	//Lower intake
 	catapult1.move_velocity(100);
 	catapult2.move_velocity(100);
-	pros::delay(700);
+	pros::delay(400);
 	catapult1.brake();
 	catapult2.brake();
 
@@ -43,18 +43,23 @@ void auton_defensive_1(){
 
 	//Scoring alliance triball
 	//Get space + rotate to goal
-	robot_set_heading_PID(330);
+	robot_set_heading_PID(335);
 
 	//Get rid of triball if it went into intake whilst 
 	//moving forward to get close to goal
 	intake.move_velocity(-600);
-	robot_set_velocity(300, 800);
+	robot_set_velocity(200, 400);
+	intake.move_velocity(-600);
+	pros::delay(500);
 	intake.brake();
 
 	//rotate back of robot to goal to avoid SG9
 	robot_set_heading_PID(150);
-	//ram into triballs now
-	robot_set_velocity(-200, 500);
+	//Go in front of goal
+	robot_set_velocity(-200, 400);
+
+	//Rotate to ensure max ramming
+	robot_set_heading_PID(180);
 
 	//Get some space
 	robot_set_velocity(100, 400);
