@@ -50,7 +50,7 @@ void auton_defensive_1(){
 	intake.move_velocity(-600);
 	robot_set_velocity(200, 400);
 	intake.move_velocity(-600);
-	pros::delay(500);
+	pros::delay(800);
 	intake.brake();
 
 	//rotate back of robot to goal to avoid SG9
@@ -68,7 +68,7 @@ void auton_defensive_1(){
 
 	//GO to EV bar
 	//Get away from goal
-	robot_set_velocity(150, 150);
+	robot_set_velocity(150, 300);
 
 	//Rotate and drive in front of EV bar
 	robot_set_heading_PID(145);
