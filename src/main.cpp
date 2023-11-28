@@ -42,15 +42,20 @@ void auton_defensive_1(){
 	wings.set_value(false);
 
 	//Scoring alliance triball
-	//Get space + rotate to goal
-	robot_set_heading_PID(335);
+	//rotate to goal but if the robot gets "stuck", move forward and try again
+	if (!robot_set_heading_PID(335)){
+		robot_set_velocity(200, 100);
+		//Try again
+		robot_set_heading_PID(335);
+	}
 
 	//Get rid of triball if it went into intake whilst 
 	//moving forward to get close to goal
 	intake.move_velocity(-600);
-	robot_set_velocity(200, 400);
-	intake.move_velocity(-600);
-	pros::delay(800);
+	robot_set_velocity(200, 250);
+	//Move back to ensure triball comes out intake
+	robot_set_velocity(-200, 90);
+	pros::delay(400);
 	intake.brake();
 
 	//rotate back of robot to goal to avoid SG9
@@ -60,6 +65,7 @@ void auton_defensive_1(){
 
 	//Rotate to ensure max ramming
 	robot_set_heading_PID(180);
+	robot_set_velocity(-200, 400);
 
 	//Get some space
 	robot_set_velocity(100, 400);
@@ -68,22 +74,28 @@ void auton_defensive_1(){
 
 	//GO to EV bar
 	//Get away from goal
-	robot_set_velocity(150, 300);
+	robot_set_velocity(150, 225);
 
-	//Rotate and drive in front of EV bar
-	robot_set_heading_PID(145);
-	robot_set_velocity(125, 1300);
+	//Try rotate and drive next to EV bar
+	if (!robot_set_heading_PID(88)){
+		robot_set_velocity(200, 100);
+		robot_set_heading_PID(88);
+	}
 
-	//Manouver so that we can drive right under the EV bar
-	robot_set_heading_PID(100);
-	robot_set_velocity(160, 350);
+	//Slowly accelerate robot forward
+	left_motors.move_velocity(30);
+	right_motors.move_velocity(30);
+	pros::delay(200);
+	left_motors.move_velocity(60);
+	right_motors.move_velocity(60);
+	pros::delay(300);
+	robot_set_velocity(120, 1000);
 
-	robot_set_heading_PID(90);
-	intake.move_velocity(-600);
-
-	//Drive under EV bar
-	robot_move_to(120, "BACK", 1400);
-
+	//Slowly rotate without PID
+	while(inertial.get_heading() < 120){
+		left_motors.move_velocity(-50);
+		right_motors.move_velocity(50);
+	}
 }
 
 
@@ -460,6 +472,8 @@ void opcontrol() {
 			//Change brake mode to reduce strain on motors
 			catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 			catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+			catapult1.brake();
+			catapult2.brake();
 			
 			hasLeftBumperSwitch = false;	
 		}
