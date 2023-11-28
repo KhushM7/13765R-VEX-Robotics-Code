@@ -174,7 +174,7 @@ void robot_moveTo_PID(std::string sensor, double distanceFromObject, bool profil
 
 // Turns the robot until it has rotated to the specified angle.
 // This function uses a PID controller.
-void robot_set_heading_PID(double angle)
+bool robot_set_heading_PID(double angle)
 {
 	//Let's define some variables that will be useful for PID
 	double kP = 2.15;
@@ -186,6 +186,9 @@ void robot_set_heading_PID(double angle)
 	double derivative = 0;
 	double prevError = angle - inertial.get_heading(); // This is needed to calculate derivative
 	double power_to_motors = 0;
+
+	//Start a little timer: this to catch whether we get stuck or not
+	int startTime = pros::millis();
 	
 	while (abs(error) > 0.8 || abs(derivative) > 0.5){
 		//Rotate using PID where the required angle is therefore greater than the current heading value
@@ -237,12 +240,22 @@ void robot_set_heading_PID(double angle)
 
 		left_motors.move(power_to_motors);
 		right_motors.move(-power_to_motors); //The right motors must spin the other way
+
+		//Check if the motors are actually able to turn or not
+		//If power_to_motors is more than 7, the robot should rotate
+		//We wait for 1.5 seconds to ensure the robot has had time to accelerate
+		if (pros::millis() - startTime > 1500 && abs(power_to_motors) >= 7 && abs(left_motors[0].get_actual_velocity()) < 1){
+			//At this point the robot has failed to complete its turn
+			stop_robot();
+			return false;			
+		}
 		
 		pros::delay(15); // This is essential for both integral and derivative.
 	}
 
 	left_motors.brake();
 	right_motors.brake();
+	return true;
 }
 
 void stop_robot(){
