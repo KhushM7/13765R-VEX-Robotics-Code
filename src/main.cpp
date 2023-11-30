@@ -43,7 +43,7 @@ void auton_defensive_1(){
 
 	//Scoring alliance triball
 	//rotate to goal but if the robot gets "stuck", move forward and try again
-	if (!robot_set_heading_PID(335)){
+	if (!robot_set_heading_PID(335, true)){
 		robot_set_velocity(200, 100);
 		//Try again
 		robot_set_heading_PID(335);
@@ -77,25 +77,23 @@ void auton_defensive_1(){
 	robot_set_velocity(150, 225);
 
 	//Try rotate and drive next to EV bar
-	if (!robot_set_heading_PID(88)){
+	if (!robot_set_heading_PID(90, true)){
 		robot_set_velocity(200, 100);
-		robot_set_heading_PID(88);
+		robot_set_heading_PID(90);
 	}
 
-	//Slowly accelerate robot forward
-	left_motors.move_velocity(30);
-	right_motors.move_velocity(30);
-	pros::delay(200);
-	left_motors.move_velocity(60);
-	right_motors.move_velocity(60);
-	pros::delay(300);
-	robot_set_velocity(120, 1000);
+	//Let robot fully stop
+	stop_robot();
+	pros::delay(400);
+	left_motors.move_velocity(200);
+	right_motors.move_velocity(200);
+	pros::delay(1400);
 
-	//Slowly rotate without PID
-	while(inertial.get_heading() < 120){
-		left_motors.move_velocity(-50);
-		right_motors.move_velocity(50);
-	}
+	//Rotate until it kinda hits the EV bar
+	left_motors.move_velocity(50);
+	right_motors.move_velocity(-50);
+	pros::delay(400);
+	
 }
 
 
@@ -138,40 +136,69 @@ void auton_offensive_1(){
 }
 
 void auton_skills(){
-	//Initialise the inertial sensor
-	inertial.reset(true);
-	//Start at a heading of 240!
-	inertial.set_heading(120);
-	bool isCataDown = false;
+	//Start on the right side of field (red defensive side technically)
+	//Switch on flywheel
+	flywheel.move_velocity(600);
+	inertial.reset(); //initialise inertial
 
-	//We will catapult for 45 seconds roughly
-	// while (pros::millis() < 45000){
-	// 	if (isCataDown){
-	// 		catapult1.brake();
-	// 		catapult2.brake();
-	// 		pros::delay(1000);
-	// 		isCataDown = false;
-	// 		catapult1.move_velocity(100);
-	// 		catapult2.move_velocity(100);
-	// 		pros::delay(400);
-	// 	}
-	// 	else {
-	// 		if (catapult_switch.get_value() == 0){
-	// 			catapult1.move_velocity(60);
-	// 			catapult2.move_velocity(60);
-	// 		}
-	// 		else{
-	// 			isCataDown = true;
-	// 		}		
-	// 	}
-	// }
+	//This delay will last entirety of matchloading period:
+	// not just 5 seconds
+	pros::delay(5000);
+
+	//Start at a heading of 135
+	inertial.set_heading(135);
+
+	//Move back to try score alliance triballs
+	robot_set_velocity(-200, 800);
+	
+	//Try rotate to 180 degrees
+	if (!robot_set_heading_PID(180, true)){
+		//Move back and try again
+		robot_set_velocity(-200, 100);
+		robot_set_heading_PID(180);
+	}
+
+	//Ram triballs 
+	robot_set_velocity(-200, 400);
+	//Get some space
+	robot_set_velocity(100, 300);
+	//Ram into triballs again
+	robot_set_velocity(-200, 500);
+
+	//Get away from goal
+	robot_set_velocity(200, 150);
+
+	//Try rotate and towards centre of field
+	if (!robot_set_heading_PID(90, true)){
+		robot_set_velocity(200, 100);
+		robot_set_heading_PID(90);
+	}
 
 	//Move towards centre of field
-	robot_set_velocity(-200, 300);
+	//First stop the robot completely to drive straight
+	stop_robot();
+	pros::delay(300);
+	
+	//Since distance sensor is faulty, trial and error this motion
+	left_motors.move_relative(360, 200);
+	right_motors.move_relative(360, 200);
+	while (!left_motors[0].is_stopped() || !right_motors[0].is_stopped()){
+		pros::delay(10);
+	}
+
+	//Now turn to centre of field
 	robot_set_heading_PID(0);
-	pros::delay(400); //Allow robot to fully stop
-	robot_move_to(150,"BACK", 1500);
-	robot_set_heading_PID(90);
+	
+	//Go to centre of field
+	//Since distance sensor is faulty, trial and error this motion
+	left_motors.move_relative(750, 200);
+	right_motors.move_relative(750, 200);
+	while (!left_motors[0].is_stopped() || !right_motors[0].is_stopped()){
+		pros::delay(10);
+	}
+
+	//Face back of robot to the bar
+	robot_set_heading_PID(270);
 
 	//Open wings
 	wings.set_value(true);
@@ -181,10 +208,12 @@ void auton_skills(){
 	while (inertial.get_roll() < 20){
 		pros::delay(5);
 	}
+	//Once you get one wheel over, stop for a bit
 	stop_robot();
 	pros::delay(500);	
+	//Slowly inch your way over the bar
 	robot_set_velocity(-70, 1000);
-	//And now score the triballs as well
+	//And now score the triballs
 	robot_set_velocity(-200, 3000);
 
 	//Ram back and score triballs one last time
