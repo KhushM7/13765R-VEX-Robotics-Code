@@ -2,7 +2,7 @@
 #ifndef AUTON_FUNCTIONS_H
 #define AUTON_FUNCTIONS_H
 
-bool robot_set_heading_PID(double angle);
+bool robot_set_heading_PID(double angle, bool failSafeIsON = false);
 void stop_robot();
 /* Moves the robot in a given direction to a specified distance from the wall. 
  * If no distance is specified, the robot will indefinitely move forwards or backwards unless told otherwise
