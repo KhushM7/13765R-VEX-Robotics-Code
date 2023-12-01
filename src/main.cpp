@@ -93,7 +93,7 @@ void auton_defensive_1(){
 	left_motors.move_velocity(50);
 	right_motors.move_velocity(-50);
 	pros::delay(400);
-	
+	stop_robot();
 }
 
 
@@ -144,6 +144,7 @@ void auton_skills(){
 	//This delay will last entirety of matchloading period:
 	// not just 5 seconds
 	pros::delay(5000);
+	flywheel.brake();
 
 	//Start at a heading of 135
 	inertial.set_heading(135);
@@ -179,29 +180,24 @@ void auton_skills(){
 	stop_robot();
 	pros::delay(300);
 	
-	//Since distance sensor is faulty, trial and error this motion
-	left_motors.move_relative(360, 200);
-	right_motors.move_relative(360, 200);
-	while (!left_motors[0].is_stopped() || !right_motors[0].is_stopped()){
-		pros::delay(10);
-	}
+	//Distance sensor is broken so have to trial and error motion
+	robot_set_velocity(200, 800);
 
 	//Now turn to centre of field
 	robot_set_heading_PID(0);
-	
-	//Go to centre of field
+	stop_robot();
+	pros::delay(400);
+	//Go to centre of field whilst reversing intake
 	//Since distance sensor is faulty, trial and error this motion
-	left_motors.move_relative(750, 200);
-	right_motors.move_relative(750, 200);
-	while (!left_motors[0].is_stopped() || !right_motors[0].is_stopped()){
-		pros::delay(10);
-	}
+	intake.move_velocity(-600);
+	robot_set_velocity(200, 800);
 
-	//Face back of robot to the bar
-	robot_set_heading_PID(270);
+	//Face front of robot to the bar
+	robot_set_heading_PID(90);
+	intake.move_velocity(600);
+	robot_set_velocity(200, 600);
+	
 
-	//Open wings
-	wings.set_value(true);
 	//Wiggle robot to get over bar
 	left_motors.move_velocity(-200);
 	right_motors.move_velocity(-200);
@@ -213,13 +209,20 @@ void auton_skills(){
 	pros::delay(500);	
 	//Slowly inch your way over the bar
 	robot_set_velocity(-70, 1000);
+
+	//Open wings
+	wings.set_value(true);
+
 	//And now score the triballs
 	robot_set_velocity(-200, 3000);
 
 	//Ram back and score triballs one last time
 	robot_set_velocity(200, 400);
-	robot_set_velocity(-200, 1000);	
+	robot_set_velocity(-200, 700);	
 
+	//Back out so we are not in contact with too many triballs
+	wings.set_value(false);
+	robot_set_velocity(200, 1000);
 	//Done!
 }
 
@@ -303,7 +306,7 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-	auton_defensive_1();
+	auton_skills();
 }
 
 //Gets the hottest motor, printing a two character code that represents the motor
@@ -491,6 +494,8 @@ void opcontrol() {
 
 		//cata go up
 		if (controller.get_digital_new_press(DIGITAL_DOWN)){
+			catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+			catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 			catapult1.move_relative(-360, -100);
 			catapult2.move_relative(-360, -100);
 		}
