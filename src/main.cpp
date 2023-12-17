@@ -41,15 +41,12 @@ void auton_defensive_1(){
 	robot_set_velocity(-120, 700);
 	wings.set_value(false);
 
-	//Go forward to get space to rotate
-	robot_set_velocity(200, 80);
-
 	//Scoring alliance triball
 	//rotate to goal but if the robot gets "stuck", move forward and try again
 	if (!robot_set_heading_PID(335, true)){
 		robot_set_velocity(200, 100);
 		//Try again
-		robot_set_heading_PID(320);
+		robot_set_heading_PID(335);
 	}
 
 	//Get rid of triball if it went into intake whilst 
@@ -138,151 +135,64 @@ void auton_offensive_1(){
 
 }
 
-void auton_skills2(){
-	//Start on the right side of field (red defensive side technically)
-	//Switch on flywheel
-	flywheel.move_velocity(600);
-	inertial.reset(); //initialise inertial
-
-	//This delay will last entirety of matchloading period:
-	// not just 5 seconds
-	pros::delay(5000);
-	flywheel.brake();
-
-	//Start at a heading of 135
-	inertial.set_heading(135);
-
-	//Move back to try score alliance triballs
-	robot_set_velocity(-200, 800);
-	
-	//Try rotate to 180 degrees
-	if (!robot_set_heading_PID(180, true)){
-		//Move back and try again
-		robot_set_velocity(-200, 100);
-		robot_set_heading_PID(180);
-	}
-
-	//Ram triballs 
-	robot_set_velocity(-200, 400);
-	//Get some space
-	robot_set_velocity(100, 300);
-	//Ram into triballs again
-	robot_set_velocity(-200, 500);
-
-	//Get away from goal
-	robot_set_velocity(200, 150);
-
-	//Try rotate and towards centre of field
-	if (!robot_set_heading_PID(90, true)){
-		robot_set_velocity(200, 100);
-		robot_set_heading_PID(90);
-	}
-
-	//Move towards centre of field
-	//First stop the robot completely to drive straight
-	stop_robot();
-	pros::delay(300);
-	
-	//Distance sensor is broken so have to trial and error motion
-	robot_set_velocity(200, 800);
-
-	//Now turn to centre of field
-	robot_set_heading_PID(0);
-	stop_robot();
-	pros::delay(400);
-	//Go to centre of field whilst reversing intake
-	//Since distance sensor is faulty, trial and error this motion
-	intake.move_velocity(-600);
-	robot_set_velocity(200, 800);
-
-	//Face front of robot to the bar
-	robot_set_heading_PID(90);
-	intake.move_velocity(600);
-	robot_set_velocity(200, 600);
-	
-
-	//Wiggle robot to get over bar
-	left_motors.move_velocity(-200);
-	right_motors.move_velocity(-200);
-	while (inertial.get_roll() < 20){
-		pros::delay(5);
-	}
-	//Once you get one wheel over, stop for a bit
-	stop_robot();
-	pros::delay(500);	
-	//Slowly inch your way over the bar
-	robot_set_velocity(-70, 1000);
-
-	//Open wings
-	wings.set_value(true);
-
-	//And now score the triballs
-	robot_set_velocity(-200, 3000);
-
-	//Ram back and score triballs one last time
-	robot_set_velocity(200, 400);
-	robot_set_velocity(-200, 700);	
-
-	//Back out so we are not in contact with too many triballs
-	wings.set_value(false);
-	robot_set_velocity(200, 1000);
-	//Done!
-}
-
 void auton_skills(){
 	//Start on the right side of field (red defensive side technically)
 	//Switch on flywheel
-	flywheel.move_velocity(600);
+	double initalTime = pros::millis();
+	flywheel.move_velocity(-600);
+	
 	inertial.reset(); //initialise inertial
+	
+	//Lower catapult until either it hits bumper switch or matchloading period is over
+	while(catapult_switch.get_value() == 0 && pros::millis() - initalTime < 40000){
+		catapult1.move_velocity(60);
+		catapult2.move_velocity(60);
+	}
 
-	//This delay will last entirety of matchloading period:
-	// not just 5 seconds
-	pros::delay(5000);
+	catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	catapult1.brake();
+	catapult2.brake();
+	intake.move_velocity(-600);
+	wings.set_value(true);
+	pros::delay(300);
+	wings.set_value(false);
+
+	while (pros::millis() - initalTime < 40000){
+		pros::delay(10);
+		
+	}
 	flywheel.brake();
+	intake.brake();
 
-	//Start at a heading of 63
+	//Start at a heading of 62
 	inertial.set_heading(62);
 
 	//Move towards centre of field//
 
 	//Go forward
-	robot_set_velocity(-200,800);
+	robot_set_velocity(200,315);
 
-	robot_set_heading_PID(0);
+	robot_set_heading_PID(180);
 
 	stop_robot();
-	pros::delay(400);
-	robot_set_velocity(200, 700);	
+	pros::delay(500);
+	robot_set_velocity(-200, 1400);
 
-	
-	
-	//Distance sensor is broken so have to trial and error motion
-	robot_set_velocity(200, 800);
-
-	//Now turn to centre of field
-	robot_set_heading_PID(0);
-	stop_robot();
-	pros::delay(400);
-	//Go to centre of field whilst reversing intake
-	//Since distance sensor is faulty, trial and error this motion
-	intake.move_velocity(-600);
-	robot_set_velocity(200, 800);
-
-	//Face front of robot to the bar
+	//Now turn to triball
 	robot_set_heading_PID(90);
-	intake.move_velocity(600);
-	robot_set_velocity(200, 600);
+	stop_robot();
+	pros::delay(400);
 
-	//Get rid of triball in front of us
+	//Intake triball in front of us
 	intake.move_velocity(600);
-	robot_set_velocity(200, 400);
+	robot_set_velocity(200, 1000);
 	
 	robot_set_heading_PID(180);
-	stop_robot();
 	intake.move_velocity(-600);
-	//Score alliance triballs
-	robot_set_velocity(-200, 200);
-	pros::delay(600);
+	robot_set_velocity(-200, 80);
+
+	robot_set_heading_PID(270);
 
 	//Wiggle robot to get over bar
 	left_motors.move_velocity(-200);
