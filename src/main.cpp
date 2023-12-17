@@ -41,12 +41,15 @@ void auton_defensive_1(){
 	robot_set_velocity(-120, 700);
 	wings.set_value(false);
 
+	//Go forward to get space to rotate
+	robot_set_velocity(200, 80);
+
 	//Scoring alliance triball
 	//rotate to goal but if the robot gets "stuck", move forward and try again
 	if (!robot_set_heading_PID(335, true)){
 		robot_set_velocity(200, 100);
 		//Try again
-		robot_set_heading_PID(335);
+		robot_set_heading_PID(320);
 	}
 
 	//Get rid of triball if it went into intake whilst 
@@ -90,8 +93,8 @@ void auton_defensive_1(){
 	pros::delay(1400);
 
 	//Rotate until it kinda hits the EV bar
-	left_motors.move_velocity(50);
-	right_motors.move_velocity(-50);
+	left_motors.move_velocity(75);
+	right_motors.move_velocity(-75);
 	pros::delay(400);
 	stop_robot();
 }
@@ -135,7 +138,7 @@ void auton_offensive_1(){
 
 }
 
-void auton_skills(){
+void auton_skills2(){
 	//Start on the right side of field (red defensive side technically)
 	//Switch on flywheel
 	flywheel.move_velocity(600);
@@ -197,6 +200,89 @@ void auton_skills(){
 	intake.move_velocity(600);
 	robot_set_velocity(200, 600);
 	
+
+	//Wiggle robot to get over bar
+	left_motors.move_velocity(-200);
+	right_motors.move_velocity(-200);
+	while (inertial.get_roll() < 20){
+		pros::delay(5);
+	}
+	//Once you get one wheel over, stop for a bit
+	stop_robot();
+	pros::delay(500);	
+	//Slowly inch your way over the bar
+	robot_set_velocity(-70, 1000);
+
+	//Open wings
+	wings.set_value(true);
+
+	//And now score the triballs
+	robot_set_velocity(-200, 3000);
+
+	//Ram back and score triballs one last time
+	robot_set_velocity(200, 400);
+	robot_set_velocity(-200, 700);	
+
+	//Back out so we are not in contact with too many triballs
+	wings.set_value(false);
+	robot_set_velocity(200, 1000);
+	//Done!
+}
+
+void auton_skills(){
+	//Start on the right side of field (red defensive side technically)
+	//Switch on flywheel
+	flywheel.move_velocity(600);
+	inertial.reset(); //initialise inertial
+
+	//This delay will last entirety of matchloading period:
+	// not just 5 seconds
+	pros::delay(5000);
+	flywheel.brake();
+
+	//Start at a heading of 63
+	inertial.set_heading(62);
+
+	//Move towards centre of field//
+
+	//Go forward
+	robot_set_velocity(-200,800);
+
+	robot_set_heading_PID(0);
+
+	stop_robot();
+	pros::delay(400);
+	robot_set_velocity(200, 700);	
+
+	
+	
+	//Distance sensor is broken so have to trial and error motion
+	robot_set_velocity(200, 800);
+
+	//Now turn to centre of field
+	robot_set_heading_PID(0);
+	stop_robot();
+	pros::delay(400);
+	//Go to centre of field whilst reversing intake
+	//Since distance sensor is faulty, trial and error this motion
+	intake.move_velocity(-600);
+	robot_set_velocity(200, 800);
+
+	//Face front of robot to the bar
+	robot_set_heading_PID(90);
+	intake.move_velocity(600);
+	robot_set_velocity(200, 600);
+
+	//Get rid of triball in front of us
+	intake.move_velocity(600);
+	robot_set_velocity(200, 400);
+	
+	robot_set_heading_PID(180);
+	stop_robot();
+	intake.move_velocity(-600);
+	//Score alliance triballs
+	robot_set_velocity(-200, 200);
+	pros::delay(600);
 
 	//Wiggle robot to get over bar
 	left_motors.move_velocity(-200);
@@ -306,7 +392,7 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-	auton_skills();
+	auton_defensive_1();
 }
 
 //Gets the hottest motor, printing a two character code that represents the motor
@@ -372,7 +458,10 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
             motorLabel = "Cata-1:  ";
         } else if (i == 6){
 			motorLabel = "Cata-2:  ";
+		} else if (i == 7){
+			motorLabel = "FlyWheel:";
 		}
+		
 		
 
         // Display the motor temperature with appropriate color
@@ -404,7 +493,8 @@ void opcontrol() {
 	 topRight,
 	 intake,
 	 catapult1,
-	 catapult2
+	 catapult2,
+	 flywheel
 	 };
 
 	controller.clear_line(0);
@@ -483,12 +573,25 @@ void opcontrol() {
 			if (flywheelIsMoving){
 				//Stop flywheel
 				flywheel.brake();
-				isIntakeOff = false;
+				flywheelIsMoving = false;
 			}
 			else{
-				//Make flywheel spin at 70%
-				flywheel.move_velocity(420);
-				isIntakeOff = true;
+				//Make flywheel spin at full
+				flywheel.move_velocity(600);
+				flywheelIsMoving = true;
+			}
+		}
+
+		if (controller.get_digital_new_press(DIGITAL_Y)){
+			if (flywheelIsMoving){
+				//Stop flywheel
+				flywheel.brake();
+				flywheelIsMoving = false;
+			}
+			else{
+				//Make flywheel spin at reverse
+				flywheel.move_velocity(-600);
+				flywheelIsMoving = true;
 			}
 		}
 
@@ -498,6 +601,8 @@ void opcontrol() {
 			catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 			catapult1.move_relative(-360, -100);
 			catapult2.move_relative(-360, -100);
+			catapultIsMoving = false;
+			hasLeftBumperSwitch = false;
 		}
 
 		if (controller.get_digital_new_press(DIGITAL_L2) && !catapultIsMoving){
