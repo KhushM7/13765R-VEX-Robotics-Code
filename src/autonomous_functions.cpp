@@ -7,10 +7,7 @@
 void robot_move_to(int motor_speed, std::string sensor, double distance, bool should_slow_down){
 	// If a distance is not specified, the robot will continue the move forwards
 	double error; //distance away from target
-	double PI = 3.141592654;
 	int initialMaxMotorSpeed = motor_speed;
-	//Using backleft motor encoder position for distance for now
-	double prevBLMotorPosition = bottomLeft.get_position();
 	int current_speed = 0;
 
 	if (sensor == "BACK"){
@@ -244,7 +241,7 @@ bool robot_set_heading_PID(double angle, bool failSafeIsON)
 		//Check if the motors are actually able to turn or not
 		//If power_to_motors is more than 7, the robot should rotate
 		//We wait for 1.5 seconds to ensure the robot has had time to accelerate
-		if (failSafeIsON && pros::millis() - startTime > 1500 && abs(power_to_motors) >= 7 && abs(left_motors[0].get_actual_velocity()) < 1){
+		if (failSafeIsON && pros::millis() - startTime > 800 && abs(power_to_motors) >= 7 && abs(left_motors[0].get_actual_velocity()) < 3){
 			//At this point the robot has failed to complete its turn
 			stop_robot();
 			return false;			
