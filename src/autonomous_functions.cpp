@@ -98,6 +98,8 @@ void odometry_tracker(){
 		robot_x.store(robotX);
 		robot_y.store(robotY);
 		robot_heading.store(current_heading);
+
+		pros::delay(5);
 	}
 	
 }
