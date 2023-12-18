@@ -396,6 +396,11 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	robot_heading.store(0);
+	robot_x.store(0);
+	robot_y.store(0);
+	pros::Task odom_task = pros::Task(odometry_tracker);
+	
 	std::vector<pros::Motor> all_motors = 
 	{bottomLeft,
 	 bottomRight,
@@ -422,6 +427,11 @@ void opcontrol() {
 	
 
 	while(true){
+		//Odometry test code
+		if (controller.get_digital(DIGITAL_B)){
+			controller.print(0, 0, "Heading: %.3F", robot_heading.load());
+		}
+
 		if (controller.get_analog(ANALOG_LEFT_Y) > 8 || controller.get_analog(ANALOG_LEFT_Y) < -8){
 			left_motors.move(controller.get_analog(ANALOG_LEFT_Y));			
 		}
