@@ -1,8 +1,106 @@
+#include <complex>
 #include <stdlib.h>
 #include "autonomous_functions.h"
 #include "pros/rtos.hpp"
 #include "variables.h"
 
+const double PI = 3.1415926535897931;
+
+double centidegreesToRadians(double centidegrees){
+    return (centidegrees * 0.01 * (PI / 180.0));
+}
+
+double radiansToDegrees(double radians){
+	return (radians * 180 / PI);
+}
+
+void odometry_tracker(){
+	//This is the function that will track the robot's motion
+	//Define some variables
+	const double wheel_radius = 2.0; //Radius of tracking wheel in inches
+	const double sL = 0; //Displacement of left tracking wheel from centre
+	const double sR = 0; //Displacement of right tracking wheel from centre
+	const double sB = 0; //Displacement of back tracking wheel from centre
+
+	//These variables are the previous rotation of each tracking wheel
+	double prev_left_pos = left_tracker.get_position();
+	double prev_right_pos = right_tracker.get_position();
+	double prev_back_pos = back_tracker.get_position();
+
+	double change_in_heading;
+
+	//These variables represent the distance travelled by a wheel per cycle
+	double deltaL, deltaR, deltaB;
+
+	//Below are variables used to store the local x,y offset
+	double localXOffset, localYOffset;
+
+	//The below local variable is used in case the global variables are in use
+	double current_heading = robot_heading.load(); 
+	double robotX = robot_x.load();
+	double robotY = robot_y.load();
+
+	//Set the refresh rate of the rotation sensors to be as small as possible
+	left_tracker.set_data_rate(5);
+	right_tracker.set_data_rate(5);
+	back_tracker.set_data_rate(5);
+	while (true){
+		//Step 1: calculate the distance each wheel has travelled
+		//Wheel travel = change in wheel position (in radians) * wheel radius
+		//s = r * deltaTheta
+		deltaL = centidegreesToRadians(left_tracker.get_position() - prev_left_pos) * wheel_radius;
+		deltaR = centidegreesToRadians(right_tracker.get_position() - prev_right_pos) * wheel_radius;
+		deltaB = centidegreesToRadians(back_tracker.get_position() - prev_back_pos) * wheel_radius;
+
+		//Update the previous variables		
+		prev_left_pos = left_tracker.get_position();
+		prev_right_pos = right_tracker.get_position();
+		prev_back_pos = back_tracker.get_position();		
+
+		//Step 2: calculate the heading (in degrees) of the robot
+		change_in_heading = (deltaL - deltaR)/(sL - sR); //in radians
+		current_heading += radiansToDegrees(change_in_heading);
+
+		//Step 3: calculate the change in position of the robot
+		if (change_in_heading == 0){
+			//If the robot has not changed its heading
+			localXOffset = deltaB;
+			localYOffset = deltaR;
+		}
+		else{
+			localXOffset = 2 * std::sin(change_in_heading/2) * ((deltaB/change_in_heading) + sB);
+			localYOffset = 2 * std::sin(change_in_heading/2) * ((deltaR/change_in_heading) + sR);
+		}
+
+		//Step 4: Convert the local change in position to the global change in position
+		double average_heading = current_heading - (change_in_heading/2);
+		//We then rotate the current local offsets by -1 * average_heading
+		//Convert the offset vector to polar coordinates
+		double polar_r = sqrt(pow(localXOffset, 2) + pow(localYOffset, 2));
+		double polar_theta = atan2(localYOffset, localXOffset); //in radians
+		//Change the angle (theta)
+		polar_theta = polar_theta - average_heading;	
+		//Convert back to cartesian coordiantes and update global position
+		robotX += polar_r * cos(polar_theta);
+		robotY += polar_r * sin(polar_theta);
+
+		//Step 5: Limit range of current heading to [0, 360]
+		//This step is not necessary but it allows us to average out this with
+		//the reading of the inertial sensor
+		if (current_heading >= 360){
+			current_heading -= 360;
+		}
+		else if (current_heading < 0){
+			current_heading += 360;
+		}
+
+		//Step 6: Update global variables
+		robot_x.store(robotX);
+		robot_y.store(robotY);
+		robot_heading.store(current_heading);
+	}
+	
+}
 
 void robot_move_to(int motor_speed, std::string sensor, double distance, bool should_slow_down){
 	// If a distance is not specified, the robot will continue the move forwards

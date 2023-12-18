@@ -27,3 +27,7 @@ pros::Distance front_dist(1);
 pros::Distance back_dist(20);
 pros::ADIDigitalIn catapult_switch('A');
 pros::ADIDigitalIn auton_switch('B');
+
+pros::Rotation left_tracker(6);
+pros::Rotation right_tracker(4);
+pros::Rotation back_tracker(5);

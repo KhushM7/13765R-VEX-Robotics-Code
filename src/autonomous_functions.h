@@ -1,4 +1,5 @@
 #include <string>
+#include <atomic>
 #ifndef AUTON_FUNCTIONS_H
 #define AUTON_FUNCTIONS_H
 
@@ -15,4 +16,11 @@ void robot_move_to(int speed, std::string sensor, double distance, bool should_s
 void robot_set_velocity(double speed, double milliseconds);
 
 void robot_moveTo_PID(std::string sensor, double distanceFromObject, bool profiledMotion = true);
+
+//Odometry functions and variables
+void odometry_tracker();
+extern std::atomic<double> robot_x;
+extern std::atomic<double> robot_y;
+extern std::atomic<double> robot_heading;
+
 #endif
