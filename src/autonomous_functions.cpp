@@ -1,4 +1,5 @@
 #include <complex>
+#include <list>
 #include <stdlib.h>
 #include "autonomous_functions.h"
 #include "pros/rtos.hpp"
@@ -103,6 +104,16 @@ void odometry_tracker(){
 	}
 	
 }
+
+void robotMoveTo(int targetX, int targetY){
+
+}
+
+void robotRotateThenMoveTo(int targetX, int targetY){
+
+}
+
+void robotFollowPoints(double points[]);
 
 void robot_set_velocity(double speed, double milliseconds){
 	left_motors.move_velocity(speed);
