@@ -109,8 +109,32 @@ void robotMoveTo(int targetX, int targetY){
 
 }
 
-void robotRotateThenMoveTo(int targetX, int targetY){
+void robotRotateToPoint(int targetX, int targetY, bool frontFacing){
+	//First calculate the desired heading
+	double desired_heading = atan2(targetY - robot_y, targetX - robot_x); 
+    desired_heading = desired_heading * 180.0 / PI;
+    desired_heading = 90 - desired_heading;
+    if (desired_heading < 0)
+    {
+        desired_heading += 360;
+    }
+    if (!frontFacing)
+    {
+        desired_heading += 180;
+        if (desired_heading >= 360) {
+            desired_heading -= 360;
+        }
+    }
 
+	//Now rotate to that heading
+	robot_set_heading_PID(desired_heading);
+}
+
+void robotRotateThenMoveTo(int targetX, int targetY, bool frontFacing){
+	robotRotateToPoint(targetX, targetY, frontFacing);
+	pros::delay(200); //Allow robot to fully stop
+	//Now use PID to move to the point in a straight line
+	
 }
 
 void robotFollowPoints(double points[]);
