@@ -104,8 +104,72 @@ void odometry_tracker(){
 	
 }
 
-void robotMoveTo(int targetX, int targetY){
+void robotMoveTo(int targetX, int targetY, bool frontFacing){
+	//We need to calculate turn velocity and drive velocity separately
+	//Then we combine the two at the end
 
+	//We will use a simple proportional loop for now
+	//If that is not precise enough then we will use the full PID loop
+	
+	//Let's define some variables
+	double drive_kP = 0;
+	double turn_kP = 0;
+
+	double turnError = 0;
+	double driveError = std::sqrt(pow(targetX - robot_x.load(), 2) + pow(targetY - robot_y.load(), 2));
+
+	double driveVelocity;
+	double turnVelocity;
+
+	//While the error is high or our robot is fast
+	while (driveError > 0.5 || abs(left_motors.get_target_velocities()[0]) > 10 || abs(right_motors.get_target_velocities()[0]) > 10){
+		//Calculate drive error using Pythagoras' Theorem
+		driveError = std::sqrt(pow(targetX - robot_x.load(), 2) + pow(targetY - robot_y.load(), 2));
+
+		//Calculate desired heading using algorithm from before
+		double desired_heading = atan2(targetY - robot_y, targetX - robot_x); 
+		desired_heading = desired_heading * 180.0 / PI;
+		desired_heading = 90 - desired_heading;
+		if (desired_heading < 0)
+		{
+			desired_heading += 360;
+		}
+		if (!frontFacing)
+		{
+			desired_heading += 180;
+			if (desired_heading >= 360) {
+				desired_heading -= 360;
+			}
+			// Since we are going backwards, the drive error must be negative
+			driveError = -driveError;
+		}
+
+		//Now calculate actual turn error
+		if (abs(desired_heading - inertial.get_heading()) <= 180)
+		{
+			turnError = desired_heading - inertial.get_heading();
+		}
+
+		else
+		{
+			if (inertial.get_heading() > desired_heading)
+			{
+				turnError = 360 + desired_heading - inertial.get_heading();
+			}
+			else
+			{
+				turnError =  desired_heading - inertial.get_heading() - 360;
+			}
+		}
+
+		//Calculate both drive and turn velocities now
+		driveVelocity = driveError * drive_kP;
+		turnVelocity = turnError * turn_kP;
+
+		//Combine the two together
+		left_motors.move(driveVelocity + turnVelocity);
+		right_motors.move(driveVelocity - turnVelocity);
+	}
 }
 
 void robotRotateToPoint(int targetX, int targetY, bool frontFacing){
