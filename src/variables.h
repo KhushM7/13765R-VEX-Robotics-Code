@@ -11,6 +11,8 @@
 extern pros::Controller controller;	
 extern pros::Motor topLeft;
 extern pros::Motor topRight;
+extern pros::Motor midLeft;
+extern pros::Motor midRight;
 extern pros::Motor bottomLeft;
 extern pros::Motor bottomRight;
 
