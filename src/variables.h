@@ -11,8 +11,6 @@
 extern pros::Controller controller;	
 extern pros::Motor topLeft;
 extern pros::Motor topRight;
-extern pros::Motor midLeft;
-extern pros::Motor midRight;
 extern pros::Motor bottomLeft;
 extern pros::Motor bottomRight;
 
@@ -20,11 +18,15 @@ extern pros::Motor_Group left_motors;
 extern pros::Motor_Group right_motors;
 
 extern pros::Motor intake;
-extern pros::Motor catapult1;
-extern pros::Motor catapult2;
+extern pros::Motor catapultLeft;
+extern pros::Motor catapultRight;
+extern pros::Motor_Group catapult_motors;
 extern pros::Motor hang;
 extern pros::Motor flywheel;
 extern pros::ADIDigitalOut wings;
+
+extern pros::ADIDigitalOut PTOpiston;
+extern bool is_PTO_on_Catapult;
 
 //Initialise sensors
 extern pros::Imu inertial;
