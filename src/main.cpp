@@ -181,6 +181,18 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
     pros::lcd::set_text_color(LV_COLOR_WHITE);
 }
 
+void display_PTO_state(){
+	while (true){
+		if (is_PTO_on_Catapult){
+			controller.print(0, 0, "4-motor drive");
+		}
+		else{
+			controller.print(0, 0, "6-motor drive");
+		}
+		pros::delay(500);
+	}	
+}
+
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -218,7 +230,9 @@ void opcontrol() {
 	//To ensure catapult cannot be touched whilst its shooting
 	bool flywheelIsMoving = false;
 	bool hasLeftBumperSwitch = false;
-	
+
+	//Start display PTO state task
+	pros::Task PTO_display_task(display_PTO_state);
 
 	while(true){
 		if (controller.get_analog(ANALOG_LEFT_Y) > 8 || controller.get_analog(ANALOG_LEFT_Y) < -8){
@@ -372,7 +386,6 @@ void opcontrol() {
 		}
 
 		//Displaying motor temperature stuff
-		display_hottest_motor(all_motors);
 		display_all_motor_temps(all_motors);
 
 		pros::delay(10); //Refresh rate of a motor
