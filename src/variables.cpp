@@ -8,8 +8,6 @@
 //Initialise devices
 pros::Controller controller(CONTROLLER_MASTER);	
 
-//PLEASE MODIFY THE PORTS and CHECK ON DEVICES IF THEY NEED TO BE REVERSED OR NOT
-//ALL OF THE BASE MOTORS ARE SET TO GREEN. PLEASE MODIFY THIS IF NOT THE CASE
 pros::Motor topLeft(1, MOTOR_GEAR_BLUE, true);
 pros::Motor topRight(4, MOTOR_GEAR_BLUE, false);
 
@@ -22,6 +20,8 @@ pros::Motor bottomRight(7, MOTOR_GEARSET_18, false);
 
 pros::Motor_Group left_motors({topLeft, bottomLeft});
 pros::Motor_Group right_motors({topRight, bottomRight});
+
+pros::ADIDigitalOut PTOpiston('D');
 bool is_PTO_on_Catapult = false;
 
 pros::Motor intake(0, MOTOR_GEAR_BLUE, false);

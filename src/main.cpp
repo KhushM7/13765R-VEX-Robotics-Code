@@ -39,11 +39,6 @@ void initialize() {
 	}
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
-
-	catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	catapult1.brake();
-	catapult2.brake();
 }
 
 
@@ -206,8 +201,8 @@ void opcontrol() {
 	 topLeft,
 	 topRight,
 	 intake,
-	 catapult1,
-	 catapult2,
+	 catapultLeft,
+	 catapultRight,
 	 flywheel
 	 };
 
@@ -227,19 +222,37 @@ void opcontrol() {
 
 	while(true){
 		if (controller.get_analog(ANALOG_LEFT_Y) > 8 || controller.get_analog(ANALOG_LEFT_Y) < -8){
-			left_motors.move(controller.get_analog(ANALOG_LEFT_Y));			
+			left_motors.move(controller.get_analog(ANALOG_LEFT_Y));
+
+			//If we are on 6 motor drive...
+			if (!is_PTO_on_Catapult){
+				catapultLeft.move(controller.get_analog(ANALOG_LEFT_Y));
+			}			
 		}
 		else{
 			left_motors.brake();
+
+			//If we are on 6 motor drive...
+			if (!is_PTO_on_Catapult){
+				catapultLeft.move(controller.get_analog(ANALOG_LEFT_Y));
+			}	
 		}
 		
 		//These if statements mean the robot will stop even if the controller position is stuck at say 1
 		// (prevents robot moving if joystick gets stuck)
 		if (controller.get_analog(ANALOG_RIGHT_Y) > 8 || controller.get_analog(ANALOG_RIGHT_Y) < -8){
 			right_motors.move(controller.get_analog(ANALOG_RIGHT_Y));
+			//If we are on 6 motor drive...
+			if (!is_PTO_on_Catapult){
+				catapultRight.move(controller.get_analog(ANALOG_LEFT_Y));
+			}
 		}
 		else{
 			right_motors.brake();
+			//If we are on 6 motor drive...
+			if (!is_PTO_on_Catapult){
+				catapultRight.brake();
+			}
 		}
 
 		//Toggle intake when Button R1 is pressed (make intake go forward)
@@ -309,12 +322,10 @@ void opcontrol() {
 			}
 		}
 
-		//cata go up
-		if (controller.get_digital_new_press(DIGITAL_DOWN)){
-			catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-			catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-			catapult1.move_relative(-360, -100);
-			catapult2.move_relative(-360, -100);
+		//The catapult will try and go up if the PTO is in position
+		if (controller.get_digital_new_press(DIGITAL_DOWN) && is_PTO_on_Catapult){
+			catapult_motors.set_brake_modes(pros::E_MOTOR_BRAKE_COAST);
+			catapult_motors.move_relative(-360, -100);
 			catapultIsMoving = false;
 			hasLeftBumperSwitch = false;
 		}
@@ -322,36 +333,40 @@ void opcontrol() {
 		if (controller.get_digital_new_press(DIGITAL_L2) && !catapultIsMoving){
 			catapultIsMoving = true;
 
+			//Switch PTO if we are using 6 motor drive
+			if (!is_PTO_on_Catapult){
+				PTOpiston.set_value(0); //MIGHT NEED TO CHANGE from 0 to 1				
+			}
+
 			//Change brake mode to reduce strain on motors
-			catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-			catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-			catapult1.brake();
-			catapult2.brake();
+			catapult_motors.set_brake_modes(pros::E_MOTOR_BRAKE_HOLD);
+			catapult_motors.brake();
 			
 			hasLeftBumperSwitch = false;	
 		}
 
-		
+		//Switch to 6 motor drive
+		if (controller.get_digital_new_press(DIGITAL_LEFT)){
+			if (is_PTO_on_Catapult){
+				PTOpiston.set_value(1);
+			}
+		}		
 
 		if (catapultIsMoving){
 			if (!hasLeftBumperSwitch){
-				catapult1.move_velocity(100);
-				catapult2.move_velocity(100);
+				catapult_motors.move_velocity(100);
 				if (catapult_switch.get_value() == 0){
 					hasLeftBumperSwitch = true;
 				}
 			}
 			//Keep rotating catapult until
 			else if (catapult_switch.get_value() == 0){
-				catapult1.move_velocity(60);
-				catapult2.move_velocity(60);
+				catapult_motors.move_velocity(60);
 			}
 			//Once we hit the bumper switch			
 			else{
-				catapult1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-				catapult2.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-				catapult1.brake();
-				catapult2.brake();
+				catapult_motors.set_brake_modes(pros::E_MOTOR_BRAKE_HOLD);
+				catapult_motors.brake();
 				catapultIsMoving = false;
 			}
 		}
