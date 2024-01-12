@@ -318,7 +318,7 @@ void opcontrol() {
 			}
 			else{
 				//Make flywheel spin at full
-				flywheel.move_velocity(600);
+				flywheel.move_voltage(12000);
 				flywheelIsMoving = true;
 			}
 		}
@@ -334,7 +334,7 @@ void opcontrol() {
 				flywheel.move_velocity(-600);
 				flywheelIsMoving = true;
 			}
-		}
+		}  
 
 		//The catapult will try and go up if the PTO is in position
 		if (controller.get_digital_new_press(DIGITAL_DOWN) && is_PTO_on_Catapult){
@@ -363,6 +363,11 @@ void opcontrol() {
 		if (controller.get_digital_new_press(DIGITAL_LEFT)){
 			if (is_PTO_on_Catapult){
 				PTOpiston.set_value(1);
+				is_PTO_on_Catapult = false;
+			}
+			else{
+				PTOpiston.set_value(0);
+				is_PTO_on_Catapult = true;
 			}
 		}		
 
