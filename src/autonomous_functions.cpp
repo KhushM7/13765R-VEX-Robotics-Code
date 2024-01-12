@@ -240,8 +240,9 @@ bool robot_set_heading_PID(double angle, bool failSafeIsON)
 
 		//Check if the motors are actually able to turn or not
 		//If power_to_motors is more than 7, the robot should rotate
-		//We wait for 1.5 seconds to ensure the robot has had time to accelerate
-		if (failSafeIsON && pros::millis() - startTime > 800 && abs(power_to_motors) >= 7 && abs(left_motors[0].get_actual_velocity()) < 3){
+		//We wait for 0.8 seconds to ensure the robot has had time to accelerate
+		if (failSafeIsON && pros::millis() - startTime > 800 && abs(power_to_motors) >= 7 
+		&& abs(left_motors[0].get_actual_velocity()) < 3){
 			//At this point the robot has failed to complete its turn
 			stop_robot();
 			return false;			
