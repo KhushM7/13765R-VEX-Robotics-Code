@@ -4,6 +4,7 @@
 #include "pros/adi.hpp"
 #include "pros/motors.hpp"
 #include "pros/rotation.hpp"
+#include <atomic>
 #ifndef VARIABLES_H
 #define VARIABLES_H
 //Define devices
@@ -26,7 +27,7 @@ extern pros::Motor flywheel;
 extern pros::ADIDigitalOut wings;
 
 extern pros::ADIDigitalOut PTOpiston;
-extern bool is_PTO_on_Catapult;
+extern std::atomic_bool is_PTO_on_base;
 
 //Initialise sensors
 extern pros::Imu inertial;
