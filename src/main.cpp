@@ -377,8 +377,22 @@ void opcontrol() {
 			}
 		}  
 
+		//Lift code
+		if (controller.get_digital_new_press(DIGITAL_L2)){
+			if (is_PTO_on_base.load()){
+				isSwitchingPTO = true;
+			}
+			else{
+				//Run lift code
+				//For now it is just a vibration on controller
+				controller.rumble("-");
+			}
+		}
+
+		//Catapult code (commented out)
 		//The catapult will try and go up if the PTO is in position
-		if (controller.get_digital_new_press(DIGITAL_DOWN) && is_PTO_on_base.load()){
+		//Catapult stuff
+		/*if (controller.get_digital_new_press(DIGITAL_DOWN) && is_PTO_on_base.load()){
 			catapult_motors.set_brake_modes(pros::E_MOTOR_BRAKE_COAST);
 			catapult_motors.move_relative(-360, -100);
 			catapultIsMoving = false;
@@ -400,15 +414,6 @@ void opcontrol() {
 			hasLeftBumperSwitch = false;	
 		}
 
-		//Switch to 6 motor drive
-		if (controller.get_analog(ANALOG_LEFT_X) <= -120
-		&& controller.get_analog(ANALOG_LEFT_Y) <= -120)
-		{
-			if (is_PTO_on_base.load()){
-				isSwitchingPTO.store(true);
-			}
-		}	
-
 		if (catapultIsMoving){
 			if (!hasLeftBumperSwitch){
 				catapult_motors.move_velocity(100);
@@ -426,7 +431,18 @@ void opcontrol() {
 				catapult_motors.brake();
 				catapultIsMoving = false;
 			}
-		}
+		}*/
+
+		//Switch to 6 motor drive
+		if (controller.get_analog(ANALOG_LEFT_X) <= -120
+		&& controller.get_analog(ANALOG_LEFT_Y) <= -120)
+		{
+			if (is_PTO_on_base.load()){
+				isSwitchingPTO.store(true);
+			}
+		}	
+
+		
 
 		pros::delay(10); //Refresh rate of a motor
 	}
