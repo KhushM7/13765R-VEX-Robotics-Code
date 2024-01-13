@@ -182,15 +182,13 @@ void display_all_motor_temps(std::vector<pros::Motor> all_motors) {
 }
 
 void display_PTO_state(){
-	while (true){
-		if (is_PTO_on_Catapult){
-			controller.print(0, 0, "4-motor drive");
-		}
-		else{
-			controller.print(0, 0, "6-motor drive");
-		}
-		pros::delay(500);
-	}	
+	if (is_PTO_on_Catapult){
+		controller.print(0, 0, "4-motor drive");
+	}
+	else{
+		controller.print(0, 0, "6-motor drive");
+	}
+	pros::delay(500);
 }
 
 /**
@@ -231,8 +229,15 @@ void opcontrol() {
 	bool flywheelIsMoving = false;
 	bool hasLeftBumperSwitch = false;
 
-	//Start display PTO state task
-	pros::Task PTO_display_task(display_PTO_state);
+	//Start display task which will display both motor temperatures
+	// and the current PTO state
+	pros::Task display_task([=](){
+		while(true){
+			display_all_motor_temps(all_motors);
+			display_PTO_state();
+			pros::delay(500);
+		}
+	});
 
 	while(true){
 		if (controller.get_analog(ANALOG_LEFT_Y) > 8 || controller.get_analog(ANALOG_LEFT_Y) < -8){
@@ -282,6 +287,8 @@ void opcontrol() {
 				isIntakeOff = true;
 			}
 		}
+
+		
 		
 		//Turn off intake when Button R2 is pressed (make intake reverse)
 		if (controller.get_digital_new_press(DIGITAL_R2)){
@@ -361,6 +368,9 @@ void opcontrol() {
 
 		//Switch to 6 motor drive
 		if (controller.get_digital_new_press(DIGITAL_LEFT)){
+			left_motors.move_velocity(120);
+			right_motors.move_velocity(120);
+			pros::delay(1000);
 			if (is_PTO_on_Catapult){
 				PTOpiston.set_value(1);
 				is_PTO_on_Catapult = false;
@@ -389,9 +399,6 @@ void opcontrol() {
 				catapultIsMoving = false;
 			}
 		}
-
-		//Displaying motor temperature stuff
-		display_all_motor_temps(all_motors);
 
 		pros::delay(10); //Refresh rate of a motor
 	}
