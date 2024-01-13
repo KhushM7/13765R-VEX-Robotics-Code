@@ -12,7 +12,7 @@ pros::Motor topLeft(19, MOTOR_GEAR_BLUE, true);
 pros::Motor topRight(18, MOTOR_GEAR_BLUE, false);
 
 pros::Motor catapultLeft(10, MOTOR_GEAR_GREEN, true);
-pros::Motor catapultRight(20, pros::E_MOTOR_GEAR_GREEN, false);
+pros::Motor catapultRight(20, pros::E_MOTOR_GEAR_GREEN, true);
 pros::Motor_Group catapult_motors({catapultLeft, catapultRight});
 
 pros::Motor bottomLeft(8, MOTOR_GEAR_BLUE, true);
@@ -22,7 +22,7 @@ pros::Motor_Group left_motors({topLeft, bottomLeft});
 pros::Motor_Group right_motors({topRight, bottomRight});
 
 pros::ADIDigitalOut PTOpiston('H');
-bool is_PTO_on_Catapult = false;
+bool is_PTO_on_Catapult = true;
 
 pros::Motor intake(0, MOTOR_GEAR_BLUE, false);
 
@@ -34,4 +34,3 @@ pros::Imu inertial(0);
 pros::Distance front_dist(0);
 pros::Distance back_dist(0);
 pros::ADIDigitalIn catapult_switch('A');
-pros::ADIDigitalIn auton_switch('B');
