@@ -1,3 +1,4 @@
+#include <cmath>
 #include <list>
 #include <stdlib.h>
 #include "autonomous_functions.h"
@@ -59,7 +60,7 @@ void odometry_tracker(){
 
 		//Step 2: calculate the heading (in degrees) of the robot
 		change_in_heading = (deltaL - deltaR)/(sL - sR); //in radians
-		current_heading += radiansToDegrees(change_in_heading);
+		current_heading = change_in_heading; //still in radians
 
 		//Step 3: calculate the change in position of the robot
 		if (change_in_heading == 0){
@@ -75,24 +76,22 @@ void odometry_tracker(){
 		//Step 4: Convert the local change in position to the global change in position
 		double average_heading = current_heading - (change_in_heading/2);
 		//We then rotate the current local offsets by -1 * average_heading
-		//Convert the offset vector to polar coordinates
-		double polar_r = sqrt(pow(localXOffset, 2) + pow(localYOffset, 2));
-		double polar_theta = atan2(localYOffset, localXOffset); //in radians
-		//Change the angle (theta)
-		polar_theta = polar_theta - average_heading;	
-		//Convert back to cartesian coordiantes and update global position
-		robotX += polar_r * cos(polar_theta);
-		robotY += polar_r * sin(polar_theta);
+		//We can use a formula to rotate the vector
+		robotX += std::cos(-average_heading) * robotX - std::sin(-average_heading) * robotY;
+		robotY += std::sin(-average_heading) * robotX + std::cos(-average_heading) * robotY;
 
-		//Step 5: Limit range of current heading to [0, 360]
+		//Step 5: Limit range of current heading to [0, 2Pi]
 		//This step is not necessary but it allows us to average out this with
-		//the reading of the inertial sensor
-		if (current_heading >= 360){
-			current_heading -= 360;
+		//the reading of the inertial sensor (once we convert to degrees again)
+		if (current_heading >= 2*PI){
+			current_heading -= 2*PI;
 		}
 		else if (current_heading < 0){
-			current_heading += 360;
+			current_heading += 2*PI;
 		}
+
+		//Convert to degrees
+		current_heading = radiansToDegrees(current_heading);
 
 		//Step 6: Update global variables
 		robot_x.store(robotX);
