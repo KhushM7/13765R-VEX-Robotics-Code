@@ -1,18 +1,35 @@
 #include <string>
+#include <atomic>
 #ifndef AUTON_FUNCTIONS_H
 #define AUTON_FUNCTIONS_H
 
 bool robot_set_heading_PID(double angle, bool failSafeIsON = false);
 void stop_robot();
-/* Moves the robot in a given direction to a specified distance from the wall. 
- * If no distance is specified, the robot will indefinitely move forwards or backwards unless told otherwise
- * NOTE: parameter sensor must either be BACK or FRONT
- * NOTE: parameter speed must be in rpm
- */ 
-void robot_move_to(int speed, std::string sensor, double distance, bool should_slow_down = true);
 
 //Set the velocity of all the drive base motors.
 void robot_set_velocity(double speed, double milliseconds);
 
-void robot_moveTo_PID(std::string sensor, double distanceFromObject, bool profiledMotion = true);
+//Odometry functions and variables
+void odometry_tracker();
+extern std::atomic<double> robot_x;
+extern std::atomic<double> robot_y;
+extern std::atomic<double> robot_heading;
+
+//Get the robot to face a point and
+//specify whether you want the back of the robot to face the front 
+//or the front of the robot
+void robotRotateToPoint(int targetX, int targetY, bool frontFacing);
+
+//Get the robot to first face a point and then move to that point 
+//in a straight line
+void robotRotateThenMoveTo(int targetX, int targetY, bool frontFacing);
+
+//Follow a smooth path of points
+//This will likely use pure pursuit
+void robotFollowPoints(double points[]);
+
+//Move to a point whilst changing the heading at the same time
+//Specify if you want the robot to face its front or not
+void robotMoveTo(int targetX, int targetY, bool frontFacing);
+
 #endif

@@ -32,6 +32,6 @@ pros::ADIDigitalOut wings('F');
 
 //Initialise sensors
 pros::Imu inertial(0);
-pros::Distance front_dist(0);
-pros::Distance back_dist(0);
-pros::ADIDigitalIn catapult_switch('A');
+pros::Rotation left_tracker(0);
+pros::Rotation right_tracker(0);
+pros::Rotation back_tracker(0);

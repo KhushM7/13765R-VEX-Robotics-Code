@@ -31,7 +31,7 @@ extern std::atomic_bool is_PTO_on_base;
 
 //Initialise sensors
 extern pros::Imu inertial;
-extern pros::Distance front_dist;
-extern pros::Distance back_dist;
-extern pros::ADIDigitalIn catapult_switch;
+extern pros::Rotation left_tracker;
+extern pros::Rotation right_tracker;
+extern pros::Rotation back_tracker;
 #endif
