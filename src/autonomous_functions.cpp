@@ -77,8 +77,8 @@ void odometry_tracker(){
 		double average_heading = current_heading - (change_in_heading/2);
 		//We then rotate the current local offsets by -1 * average_heading
 		//We can use a formula to rotate the vector
-		robotX += std::cos(-average_heading) * robotX - std::sin(-average_heading) * robotY;
-		robotY += std::sin(-average_heading) * robotX + std::cos(-average_heading) * robotY;
+		robotX += std::cos(-average_heading) * localXOffset - std::sin(-average_heading) * localYOffset;
+		robotY += std::sin(-average_heading) * localXOffset + std::cos(-average_heading) * localYOffset;
 
 		//Step 5: Limit range of current heading to [0, 2Pi]
 		//This step is not necessary but it allows us to average out this with
