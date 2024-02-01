@@ -295,7 +295,7 @@ void opcontrol() {
 				right_motors.move(controller.get_analog(ANALOG_RIGHT_Y));
 				//If we are on 6 motor drive...
 				if (is_PTO_on_base.load()){
-					catapultRight.move(controller.get_analog(ANALOG_LEFT_Y));
+					catapultRight.move(controller.get_analog(ANALOG_RIGHT_Y));
 				}
 			}
 			else{
@@ -437,9 +437,7 @@ void opcontrol() {
 		if (controller.get_analog(ANALOG_LEFT_X) <= -120
 		&& controller.get_analog(ANALOG_LEFT_Y) <= -120)
 		{
-			if (is_PTO_on_base.load()){
-				isSwitchingPTO.store(true);
-			}
+			is_PTO_on_base = false;
 		}	
 
 		
