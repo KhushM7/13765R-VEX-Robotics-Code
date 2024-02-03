@@ -17,17 +17,16 @@ double radiansToDegrees(double radians){
 void odometry_tracker(){
 	//This is the function that will track the robot's motion
 	//Define some variables
-	const double wheel_radius = 2.0; //Radius of tracking wheel in inches
-	const double sL = 0; //Displacement of left tracking wheel from centre
+	const double wheel_radius = 2.75; //Radius of tracking wheel in inches
 	const double sR = 0; //Displacement of right tracking wheel from centre
 	const double sB = 0; //Displacement of back tracking wheel from centre
 
 	//These variables are the previous rotation of each tracking wheel
-	double prev_left_pos = left_tracker.get_position();
 	double prev_right_pos = right_tracker.get_position();
 	double prev_back_pos = back_tracker.get_position();
 
 	double change_in_heading;
+	double prev_heading;
 
 	//These variables represent the distance travelled by a wheel per cycle
 	double deltaL, deltaR, deltaB;
@@ -41,25 +40,39 @@ void odometry_tracker(){
 	double robotY = robot_y.load();
 
 	//Set the refresh rate of the rotation sensors to be as small as possible
-	left_tracker.set_data_rate(5);
 	right_tracker.set_data_rate(5);
 	back_tracker.set_data_rate(5);
 	while (true){
 		//Step 1: calculate the distance each wheel has travelled
 		//Wheel travel = change in wheel position (in radians) * wheel radius
 		//s = r * deltaTheta
-		deltaL = centidegreesToRadians(left_tracker.get_position() - prev_left_pos) * wheel_radius;
 		deltaR = centidegreesToRadians(right_tracker.get_position() - prev_right_pos) * wheel_radius;
 		deltaB = centidegreesToRadians(back_tracker.get_position() - prev_back_pos) * wheel_radius;
 
 		//Update the previous variables		
-		prev_left_pos = left_tracker.get_position();
 		prev_right_pos = right_tracker.get_position();
 		prev_back_pos = back_tracker.get_position();		
 
 		//Step 2: calculate the heading (in degrees) of the robot
-		change_in_heading = (deltaL - deltaR)/(sL - sR); //in radians
-		current_heading = change_in_heading; //still in radians
+		current_heading = inertial.get_heading();
+		
+		//If the robot has changed its heading by more than 180 degrees in 5 ms,
+		//it has just finished a rotation. (e.g. from 358 degrees to 4 degrees or
+		//vice versa. This is a change in heading of 6 degrees)
+		if (abs(change_in_heading) <= 180){
+			change_in_heading = current_heading - prev_heading;
+		}
+		else if (abs(prev_heading - current_heading) >= 180)
+		{
+			if (current_heading > prev_heading)
+			{
+				change_in_heading = -(360 + prev_heading - current_heading);
+			}
+			else
+			{
+				change_in_heading =  -(prev_heading - current_heading - 360);
+			}
+		}
 
 		//Step 3: calculate the change in position of the robot
 		if (change_in_heading == 0){
@@ -73,24 +86,11 @@ void odometry_tracker(){
 		}
 
 		//Step 4: Convert the local change in position to the global change in position
-		double average_heading = current_heading - (change_in_heading/2);
+		double average_heading = current_heading - (change_in_heading/2); //In degrees
 		//We then rotate the current local offsets by -1 * average_heading
 		//We can use a formula to rotate the vector
 		robotX += std::cos(-average_heading) * robotX - std::sin(-average_heading) * robotY;
 		robotY += std::sin(-average_heading) * robotX + std::cos(-average_heading) * robotY;
-
-		//Step 5: Limit range of current heading to [0, 2Pi]
-		//This step is not necessary but it allows us to average out this with
-		//the reading of the inertial sensor (once we convert to degrees again)
-		if (current_heading >= 2*PI){
-			current_heading -= 2*PI;
-		}
-		else if (current_heading < 0){
-			current_heading += 2*PI;
-		}
-
-		//Convert to degrees
-		current_heading = radiansToDegrees(current_heading);
 
 		//Step 6: Update global variables
 		robot_x.store(robotX);
