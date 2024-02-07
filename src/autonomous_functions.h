@@ -33,6 +33,6 @@ void robotFollowPoints(double points[]);
 
 //Move to a point whilst changing the heading at the same time
 //Specify if you want the robot to face its front or not
-void robotMoveTo(int targetX, int targetY, bool frontFacing);
+void robotMoveTo(int targetX, int targetY, bool frontFacing, int PIDConstants = 0, int initialDirection = 0);
 
 #endif

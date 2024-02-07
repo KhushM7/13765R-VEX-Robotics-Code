@@ -48,7 +48,6 @@ void odometry_tracker(){
 	double robotX = robot_x.load();
 	double robotY = robot_y.load();
 	double prev_heading = current_heading;
-	int noCycles = 0;
 
 	//Set the refresh rate of the rotation sensors to be as small as possible
 	right_tracker.set_data_rate(5);
@@ -110,39 +109,67 @@ void odometry_tracker(){
 		robot_y.store(robotY);
 		robot_heading.store(current_heading);
 
-		if (noCycles >= 20){
-			controller.print(0, 0, "X: %.2F, Y: %.2F", robot_x.load(), robot_y.load());
-			//controller.print(0, 0, "%.2F", current_heading);
-		}
-		noCycles++;
-
 		pros::delay(10);
 	}
 	
 }
 
-void robotMoveTo(int targetX, int targetY, bool frontFacing){
+int sign(double number){
+	if (number < 0){
+		return -1;
+	}
+	else if (number > 0){
+		return 1;
+	}
+	return 0;
+}
+
+void robotMoveTo(int targetX, int targetY, bool frontFacing, int PIDConstants, int initialDirection){
 	//We need to calculate turn velocity and drive velocity separately
 	//Then we combine the two at the end
 
 	//We will use a simple proportional loop for now
 	//If that is not precise enough then we will use the full PID loop
 	
-	//Let's define some variables
-	double drive_kP = 0;
-	double turn_kP = 0;
+	//Let's define some PID constants
+
+	//These are the standard PID constants (when PIDConstants = 0)
+	double drive_kP = 15;
+	double drive_kI = 0.4;
+	double drive_kD = 0;
+	double turn_kP = 30;
 
 	double turnError = 0;
 	double driveError = std::sqrt(pow(targetX - robot_x.load(), 2) + pow(targetY - robot_y.load(), 2));
+	double driveIntegral = 0;
+	double driveDerivative = 0;
+	double prevDriveError = driveError; //Used for calculating derivative
 
 	double driveVelocity;
 	double turnVelocity;
 
-	//While the error is high or our robot is fast
-	while (driveError > 0.5 || abs(left_motors.get_target_velocities()[0]) > 10 || abs(right_motors.get_target_velocities()[0]) > 10){
-		//Calculate drive error using Pythagoras' Theorem
-		driveError = std::sqrt(pow(targetX - robot_x.load(), 2) + pow(targetY - robot_y.load(), 2));
+	double failsafetimer = 0;
 
+	bool disableTurnVel = false;
+	int direction;
+	//Determine our initial direction (are we going forwards to go to the target?)
+	//If yes, direction = 1. If we are reversing, direction = -1
+	if (initialDirection == 1){
+		direction = 1;
+	}
+	else if (initialDirection == -1){
+		direction = -1;
+	}
+	else if (frontFacing){
+		direction = 1;
+	}
+	else{
+		direction = -1;
+	}
+
+	//While the error is high or our robot is fast
+	while ((abs(driveError) > 2 || abs(left_motors.get_actual_velocities()[0]) > 60 
+	|| abs(right_motors.get_actual_velocities()[0]) > 60)){
 		//Calculate desired heading using algorithm from before
 		double desired_heading = atan2(targetY - robot_y, targetX - robot_x); 
 		desired_heading = desired_heading * 180.0 / PI;
@@ -157,8 +184,6 @@ void robotMoveTo(int targetX, int targetY, bool frontFacing){
 			if (desired_heading >= 360) {
 				desired_heading -= 360;
 			}
-			// Since we are going backwards, the drive error must be negative
-			driveError = -driveError;
 		}
 
 		//Now calculate actual turn error
@@ -179,19 +204,64 @@ void robotMoveTo(int targetX, int targetY, bool frontFacing){
 			}
 		}
 
+		//Calculate drive error using Pythagoras' Theorem
+		driveError = std::sqrt(pow(targetX - robot_x.load(), 2) + pow(targetY - robot_y.load(), 2));
+		//If we pass our set point, we need to reverse the motors
+		//If our error increases (derivative > 0) AND are motors are going in the same direction they 
+		// have been told to go to, then we can flip the direction
+		if (driveDerivative > 0.2 && sign(left_motors.get_actual_velocities()[0]) == direction){			
+			direction = -direction;
+		}
+		//Now we need to get the derivative and integral constants
+		driveIntegral += driveError;
+
+		// When we reach our target value, we need to reset our integral so that the robot
+		// doesn't overshoot
+		if (abs(driveError) < 0.5){
+			driveIntegral = 0;
+		}
+
+		// To prevent integral windup 
+		if (abs(driveIntegral) > 10){
+			driveIntegral = 0;
+		}
+
+		// Derivative
+		driveDerivative = driveError - prevDriveError; //This is the change of error
+		prevDriveError = driveError;
+
 		//Calculate both drive and turn velocities now
-		driveVelocity = driveError * drive_kP;
+		driveVelocity = direction * (driveError * drive_kP + driveIntegral * drive_kI + driveDerivative * drive_kD);
 		turnVelocity = turnError * turn_kP;
 
 		//Reset turn velocity if the robot is too close to the target
-		//For now, this is when the robot is 2 inches away from the target
-		if (abs(driveError) < 2){
+		//For now, this is when the robot is 6 inches away from the target
+		if (abs(driveError) < 6){
+			disableTurnVel = true;
+		}
+		
+		if (disableTurnVel){
 			turnVelocity = 0;
+		}
+
+		if (abs(left_motors.get_actual_velocities()[0]) < 0.2 && abs(right_motors.get_actual_velocities()[0]) < 0.2){
+			if (failsafetimer == 0){
+				failsafetimer = pros::millis();
+			}
+			//If the robot is basically not moving for 300 ms
+			else if (pros::millis() - failsafetimer > 300){
+				break;
+			}
+			
+		}
+		else {
+			failsafetimer = 0;
 		}
 
 		//Combine the two together
 		left_motors.move(driveVelocity + turnVelocity);
 		right_motors.move(driveVelocity - turnVelocity);
+		pros::delay(15);
 	}
 }
 
@@ -340,7 +410,7 @@ bool robot_set_heading_PID(double angle, bool failSafeIsON)
 {
 	//Let's define some variables that will be useful for PID
 	double kP = 2.53;
-	double kI = 0.11;
+	double kI = 0.21;
 	double kD = 0.51;
 
 	double current_angle = robot_heading.load();
