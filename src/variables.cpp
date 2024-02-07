@@ -23,7 +23,7 @@ pros::Motor_Group left_motors({topLeft, bottomLeft});
 pros::Motor_Group right_motors({topRight, bottomRight});
 
 pros::ADIDigitalOut PTOpiston('H');
-std::atomic_bool is_PTO_on_base = true;
+std::atomic_bool is_PTO_on_base = false;
 
 pros::Motor intake(0, MOTOR_GEAR_BLUE, false);
 

@@ -268,7 +268,7 @@ void opcontrol() {
 	pros::Task PTO_switching_task(switch_PTO_state);
 
 	while(true){
-		//Drive bas code
+		//Drive base code
 		if (!isSwitchingPTO.load()){			
 			if (controller.get_analog(ANALOG_LEFT_Y) > 8 || controller.get_analog(ANALOG_LEFT_Y) < -8){
 				left_motors.move(controller.get_analog(ANALOG_LEFT_Y));
