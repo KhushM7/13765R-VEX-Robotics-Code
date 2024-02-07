@@ -9,6 +9,9 @@ void stop_robot();
 //Set the velocity of all the drive base motors.
 void robot_set_velocity(double speed, double milliseconds);
 
+//MOve the robot by a relative distance from its current position
+void robotMoveBy(double dist_in_inches);
+
 //Odometry functions and variables
 void odometry_tracker();
 extern std::atomic<double> robot_x;
