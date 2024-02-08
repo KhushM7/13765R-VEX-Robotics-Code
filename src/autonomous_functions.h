@@ -6,7 +6,8 @@
 bool robot_set_heading_PID(double angle, bool failSafeIsON = false);
 void stop_robot();
 
-//Set the velocity of all the drive base motors.
+//Set the velocity of all the drive base motors. If milliseconds = 0, 
+//robot moves indefinitely.
 void robot_set_velocity(double speed, double milliseconds);
 
 //MOve the robot by a relative distance from its current position

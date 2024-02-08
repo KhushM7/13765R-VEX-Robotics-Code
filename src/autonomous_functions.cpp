@@ -349,9 +349,11 @@ void robotFollowPoints(double points[]){
 void robot_set_velocity(double speed, double milliseconds){
 	left_motors.move_velocity(speed);
 	right_motors.move_velocity(speed);
-	pros::delay(milliseconds);
-	left_motors.brake();
-	right_motors.brake();
+	if (milliseconds != 0){
+		pros::delay(milliseconds);
+		left_motors.brake();
+		right_motors.brake();
+	}	
 }
 
 // Turns the robot until it has rotated to the specified angle.
