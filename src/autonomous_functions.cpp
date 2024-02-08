@@ -124,7 +124,7 @@ int sign(double number){
 	return 0;
 }
 
-void robotMoveTo(int targetX, int targetY, bool frontFacing, int PIDConstants, int initialDirection){
+void robotMoveTo(double targetX, double targetY, bool frontFacing, int PIDConstants, int initialDirection){
 	//We need to calculate turn velocity and drive velocity separately
 	//Then we combine the two at the end
 
@@ -317,7 +317,7 @@ void robotMoveBy(double dist_in_inches){
 	}
 }
 
-bool robotRotateToPoint(int targetX, int targetY, bool frontFacing, bool failSafeIsON){
+bool robotRotateToPoint(double targetX, double targetY, bool frontFacing, bool failSafeIsON){
 	//First calculate the desired heading
 	double desired_heading = atan2(targetY - robot_y, targetX - robot_x); 
     desired_heading = desired_heading * 180.0 / PI;
@@ -338,59 +338,9 @@ bool robotRotateToPoint(int targetX, int targetY, bool frontFacing, bool failSaf
 	return robot_set_heading_PID(desired_heading, true);
 }
 
-void robotRotateThenMoveTo(int targetX, int targetY, bool frontFacing){
+void robotRotateThenMoveTo(double targetX, double targetY, bool frontFacing){
 	robotRotateToPoint(targetX, targetY, frontFacing);
-	pros::delay(200); //Allow robot to fully stop
-	//Now use PID to move to the point in a straight line
-	//If robot doesn't move in a straight line at first, may need to 
-	//a pure pursuit like thing.
-
-	//Define some PID variables
-	const double kP = 0;
-	const double kI = 0;
-	const double kD = 0;
-
-	//Uses Pythagoras' theorem
-    double error = std::sqrt(pow(targetX - robot_x.load(), 2) + pow(targetY - robot_y.load(), 2));
-    double integral = 0;
-    double derivative = 0;
-    double prevError;
-    double power_to_motors = 0;	
-
-	//Keep going until we are only 5mm or roughly a quarter of an inch away from the target
-	//If we are moving too fast, we do not exit the loop
-	while (abs(error) > 0.25 || derivative > 0.5){
-		//Calculate the error using Pythogoras' theorem
-		error = std::sqrt(pow(targetX - robot_x.load(), 2) + pow(targetY - robot_y.load(), 2));
-		if (!frontFacing){
-			//If we are going backwards, error must be negative
-			error = -error;
-		}
-
-				// Integral			
-		integral += error;
-
-		// When we reach our target value, we need to reset our integral so that the robot
-		// doesn't overshoot
-		if (abs(error) < 0.2){
-			integral = 0;
-		}
-
-		// To prevent integral windup 
-		if (abs(error) > 10){
-			integral = 0;
-		}
-
-		// Derivative
-		derivative = error - prevError; //This is the change of error
-		prevError = error;
-		
-		//Power = proportional + integral + derivative
-		power_to_motors = (kP * error) + (kI * integral)+ (kD * derivative);
-
-		left_motors.move(power_to_motors);
-		right_motors.move(power_to_motors); 
-	}
+	robotMoveTo(targetX, targetY, frontFacing);
 }
 
 void robotFollowPoints(double points[]){

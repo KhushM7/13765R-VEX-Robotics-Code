@@ -21,11 +21,11 @@ extern std::atomic<double> robot_heading;
 //Get the robot to face a point and
 //specify whether you want the back of the robot to face the front 
 //or the front of the robot
-bool robotRotateToPoint(int targetX, int targetY, bool frontFacing, bool failSafeIsON = false);
+bool robotRotateToPoint(double targetX, double targetY, bool frontFacing, bool failSafeIsON = false);
 
 //Get the robot to first face a point and then move to that point 
 //in a straight line
-void robotRotateThenMoveTo(int targetX, int targetY, bool frontFacing);
+void robotRotateThenMoveTo(double targetX, double targetY, bool frontFacing);
 
 //Follow a smooth path of points
 //This will likely use pure pursuit
@@ -33,6 +33,6 @@ void robotFollowPoints(double points[]);
 
 //Move to a point whilst changing the heading at the same time
 //Specify if you want the robot to face its front or not
-void robotMoveTo(int targetX, int targetY, bool frontFacing, int PIDConstants = 0, int initialDirection = 0);
+void robotMoveTo(double targetX, double targetY, bool frontFacing, int PIDConstants = 0, int initialDirection = 0);
 
 #endif
