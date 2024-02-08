@@ -317,7 +317,7 @@ void robotMoveBy(double dist_in_inches){
 	}
 }
 
-void robotRotateToPoint(int targetX, int targetY, bool frontFacing){
+bool robotRotateToPoint(int targetX, int targetY, bool frontFacing, bool failSafeIsON){
 	//First calculate the desired heading
 	double desired_heading = atan2(targetY - robot_y, targetX - robot_x); 
     desired_heading = desired_heading * 180.0 / PI;
@@ -335,7 +335,7 @@ void robotRotateToPoint(int targetX, int targetY, bool frontFacing){
     }
 	
 	//Now rotate to that heading
-	robot_set_heading_PID(desired_heading);
+	return robot_set_heading_PID(desired_heading, true);
 }
 
 void robotRotateThenMoveTo(int targetX, int targetY, bool frontFacing){
