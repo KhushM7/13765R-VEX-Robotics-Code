@@ -36,7 +36,6 @@ void odometry_tracker(){
 
 	double change_in_heading = 0;
 	
-
 	//These variables represent the distance travelled by a wheel per cycle
 	double deltaR, deltaB;
 
@@ -49,7 +48,8 @@ void odometry_tracker(){
 	double robotY = robot_y.load();
 	double prev_heading = current_heading;
 
-	//Set the refresh rate of the rotation sensors to be as small as possible
+	//Set the refresh rate of the rotation sensors
+	// to be as small as possible
 	right_tracker.set_data_rate(5);
 	back_tracker.set_data_rate(5);
 	inertial.set_data_rate(5);
@@ -87,14 +87,16 @@ void odometry_tracker(){
 		prev_heading = current_heading;
 
 		//Step 3: calculate the change in position of the robot
-		if (abs(change_in_heading) <0.1){
+		if (change_in_heading == 0){
 			//If the robot has not changed its heading
 			localXOffset = deltaB;
 			localYOffset = deltaR;
 		}
 		else{
-			localXOffset = 2 * std::sin(degreesToRadians(change_in_heading)/2) * ((deltaB/degreesToRadians(change_in_heading)) + sB);
-			localYOffset = 2 * std::sin(degreesToRadians(change_in_heading)/2) * ((deltaR/degreesToRadians(change_in_heading)) + sR);
+			localXOffset = 2 * std::sin(degreesToRadians(change_in_heading)/2) 
+			* ((deltaB/degreesToRadians(change_in_heading)) + sB);
+			localYOffset = 2 * std::sin(degreesToRadians(change_in_heading)/2) 
+			* ((deltaR/degreesToRadians(change_in_heading)) + sR);
 		}
 
 		//Step 4: Convert the local change in position to the global change in position
@@ -259,8 +261,15 @@ void robotMoveTo(double targetX, double targetY, bool frontFacing, int PIDConsta
 		}
 
 		//Combine the two together
-		left_motors.move(driveVelocity + turnVelocity);
+		left_motors.move(driveVelocity + turnVelocity);		
 		right_motors.move(driveVelocity - turnVelocity);
+
+		//If we are on 6 motor drive, power other motors
+		if (is_PTO_on_base.load()){
+			catapultLeft.move(driveVelocity + turnVelocity);
+			catapultRight.move(driveVelocity - turnVelocity);
+		}
+		
 		pros::delay(15);
 	}
 }
@@ -347,12 +356,21 @@ void robotFollowPoints(double points[]){
 	
 };
 void robot_set_velocity(double speed, double milliseconds){
-	left_motors.move_velocity(speed);
+	left_motors.move_velocity(speed);	
 	right_motors.move_velocity(speed);
+	if (is_PTO_on_base.load()){
+		catapultLeft.move_velocity(speed);
+		catapultRight.move_velocity(speed);
+	}
+	
 	if (milliseconds != 0){
 		pros::delay(milliseconds);
 		left_motors.brake();
 		right_motors.brake();
+		if (is_PTO_on_base.load()){
+			catapultLeft.brake();
+			catapultRight.brake();
+		}
 	}	
 }
 
@@ -426,8 +444,12 @@ bool robot_set_heading_PID(double angle, bool failSafeIsON)
 			power_to_motors = 10;
 		}	
 
-		left_motors.move(power_to_motors);
+		left_motors.move(power_to_motors);		
 		right_motors.move(-power_to_motors); //The right motors must spin the other way
+		if (is_PTO_on_base){
+			catapultLeft.move(power_to_motors);
+			catapultRight.move(-power_to_motors);
+		}		
 
 		//Check if the motors are actually able to turn or not
 		//If power_to_motors is more than 7, the robot should rotate
