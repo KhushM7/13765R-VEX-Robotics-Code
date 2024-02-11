@@ -444,51 +444,7 @@ void opcontrol() {
 				controller.rumble("-");
 			}
 		}
-
-		//Catapult code (commented out)
-		//The catapult will try and go up if the PTO is in position
-		//Catapult stuff
-		/*if (controller.get_digital_new_press(DIGITAL_DOWN) && is_PTO_on_base.load()){
-			catapult_motors.set_brake_modes(pros::E_MOTOR_BRAKE_COAST);
-			catapult_motors.move_relative(-360, -100);
-			catapultIsMoving = false;
-			hasLeftBumperSwitch = false;
-		}
-
-		if (controller.get_digital_new_press(DIGITAL_L2) && !catapultIsMoving){
-			catapultIsMoving = true;
-
-			//Switch PTO if we are using 6 motor drive
-			if (!is_PTO_on_base.load()){
-				PTOpiston.set_value(0);				
-			}
-
-			//Change brake mode to reduce strain on motors
-			catapult_motors.set_brake_modes(pros::E_MOTOR_BRAKE_HOLD);
-			catapult_motors.brake();
-			
-			hasLeftBumperSwitch = false;	
-		}
-
-		if (catapultIsMoving){
-			if (!hasLeftBumperSwitch){
-				catapult_motors.move_velocity(100);
-				if (catapult_switch.get_value() == 0){
-					hasLeftBumperSwitch = true;
-				}
-			}
-			//Keep rotating catapult until
-			else if (catapult_switch.get_value() == 0){
-				catapult_motors.move_velocity(60);
-			}
-			//Once we hit the bumper switch			
-			else{
-				catapult_motors.set_brake_modes(pros::E_MOTOR_BRAKE_HOLD);
-				catapult_motors.brake();
-				catapultIsMoving = false;
-			}
-		}*/
-
+		
 		//Switch to 6 motor drive
 		if (controller.get_analog(ANALOG_LEFT_X) <= -120
 		&& controller.get_analog(ANALOG_LEFT_Y) <= -120)
