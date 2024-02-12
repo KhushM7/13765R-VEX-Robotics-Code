@@ -141,6 +141,10 @@ void robotMoveTo(double targetX, double targetY, bool frontFacing, int PIDConsta
 	double drive_kD = 0;
 	double turn_kP = 30;
 
+	if (PIDConstants == 1){
+		turn_kP = 2;
+	}
+
 	double turnError = 0;
 	double driveError = std::sqrt(pow(targetX - robot_x.load(), 2) + pow(targetY - robot_y.load(), 2));
 	double driveIntegral = 0;
@@ -347,9 +351,9 @@ bool robotRotateToPoint(double targetX, double targetY, bool frontFacing, bool f
 	return robot_set_heading_PID(desired_heading, true);
 }
 
-void robotRotateThenMoveTo(double targetX, double targetY, bool frontFacing){
+void robotRotateThenMoveTo(double targetX, double targetY, bool frontFacing, int PIDConstants){
 	robotRotateToPoint(targetX, targetY, frontFacing);
-	robotMoveTo(targetX, targetY, frontFacing);
+	robotMoveTo(targetX, targetY, frontFacing, PIDConstants);
 }
 
 void robotFollowPoints(double points[]){

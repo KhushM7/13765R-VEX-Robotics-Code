@@ -26,7 +26,7 @@ bool robotRotateToPoint(double targetX, double targetY, bool frontFacing, bool f
 
 //Get the robot to first face a point and then move to that point 
 //in a straight line
-void robotRotateThenMoveTo(double targetX, double targetY, bool frontFacing);
+void robotRotateThenMoveTo(double targetX, double targetY, bool frontFacing, int PIDConstants = 0);
 
 //Follow a smooth path of points
 //This will likely use pure pursuit
