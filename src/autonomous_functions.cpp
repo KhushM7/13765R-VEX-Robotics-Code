@@ -1,6 +1,7 @@
 #include <atomic>
 #include <stdlib.h>
 #include "autonomous_functions.h"
+#include "pros/motors.h"
 #include "pros/rtos.hpp"
 #include "variables.h"
 
@@ -359,12 +360,15 @@ void robotRotateThenMoveTo(double targetX, double targetY, bool frontFacing, int
 void robotFollowPoints(double points[]){
 	
 };
-void robot_set_velocity(double speed, double milliseconds){
-	left_motors.move_velocity(speed);	
-	right_motors.move_velocity(speed);
+void robot_set_velocity(double percent, double milliseconds){
+	//Calculate desired speed based on gear ratios
+	double maindrivespeed = percent/100 * 600; //Blue gears
+	double PTOdrivespeed = percent/100 * 200; //Green gears
+	left_motors.move_velocity(maindrivespeed);	
+	right_motors.move_velocity(maindrivespeed);
 	if (is_PTO_on_base.load()){
-		catapultLeft.move_velocity(speed);
-		catapultRight.move_velocity(speed);
+		catapultLeft.move_velocity(PTOdrivespeed);
+		catapultRight.move_velocity(PTOdrivespeed);
 	}
 	
 	if (milliseconds != 0){

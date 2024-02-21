@@ -21,15 +21,20 @@
 std::atomic_bool isSwitchingPTO = false;
 
 //Autonomous functions
-void auton_defensive_1(){}
+void auton_defensive_SAFE_AWP(){
+	
+}
 
 
-void auton_offensive_1(){
+void auton_offensive(){
 	//First determine the starting position + heading
-	inertial.set_heading(67.3); //Need to change
+	inertial.set_heading(0); //Need to change
 	robot_heading = inertial.get_heading();
-	robot_x = 24; //Need to measure
-	robot_y = 15; //Need to measure
+	robot_x = 112; //Need to measure
+	robot_y = 14.5; //Need to measure
+
+	//Start the odometry task
+	pros::Task odom_task(odometry_tracker);
 
 	//Flick alliance triball with wings.
 	wings.set_value(true);
@@ -39,18 +44,19 @@ void auton_offensive_1(){
 	//Go and intake centre triball.
 	//Directly move to the target
 	//intake.move_velocity(600);
-	robotMoveTo(76, 68.5, true);
-	pros::delay(200); //Give time to actually intake triball
+	robotRotateThenMoveTo(110, 90, true);
+	stop_robot();
+	pros::delay(2000); //Give time to actually intake triball
 	
 	//Now score both centre triballs
 	robot_set_heading_PID(90);
 	wings.set_value(true); //May not do this in case opponent tries to stop us
 	//intake.move_velocity(-600)
-	robot_set_velocity(600, 1000);
+	robot_set_velocity(100, 1000);
 	//intake.brake();
 
 	//Go back and score non-neutral zone triballs
-	robot_set_velocity(-600, 400); //Get some space
+	robot_set_velocity(-100, 400); //Get some space
 	//Walk to the triball nearest to us
 	//intake.set_velocity(600)
 	robotRotateThenMoveTo(74, 51, true);
@@ -61,29 +67,29 @@ void auton_offensive_1(){
 	//Remove triball from corner
 	robot_set_heading_PID(45);
 	wings.set_value(1);
-	robot_set_velocity(600, 700);
+	robot_set_velocity(100, 700);
 
 	//Now rotate to score
 	if (!robot_set_heading_PID(0)){
 		//If we get caught on the bar
-		robot_set_velocity(600, 100);
+		robot_set_velocity(100, 100);
 		robotRotateToPoint(128, 96, true);
 	}
 
 	//Ram the triballs twice to finish off the routine
-	robot_set_velocity(600, 800);
-	robot_set_velocity(-600, 500);
-	robot_set_velocity(600,800);
+	robot_set_velocity(100, 800);
+	robot_set_velocity(-100, 500);
+	robot_set_velocity(100,800);
 	
 	//MOve away from goal to avoid touching triballs
-	robot_set_velocity(-600, 500);
+	robot_set_velocity(-100, 500);
 	
 }
 
 void auton_skills(){
 	//We will start facing the goal
 	//First determine the starting position + heading
-	inertial.set_heading(67.3); //Need to change
+	inertial.set_heading(337.2); //Need to change
 	robot_heading = inertial.get_heading();
 	robot_x = 24; //Need to measure
 	robot_y = 15; //Need to measure
@@ -103,27 +109,27 @@ void auton_skills(){
 	wings.set_value(1);
 	//Now rotate and score the triballs
 	robotRotateToPoint(12, 36, false);
-	robot_set_velocity(600, 500);
-	robot_set_velocity(-600, 900);
+	robot_set_velocity(100, 500);
+	robot_set_velocity(-100, 900);
 	*/
 	//Now move to the other side of the field
 	//Get some space
-	robot_set_velocity(600, 100);
+	robot_set_velocity(100, 100);
 	//Move to otherside now
 	robotRotateThenMoveTo(36, 11, true);
-	robotRotateThenMoveTo(108, 11, true);
+	robotRotateThenMoveTo(108, 11, true, 1);
 
 	//Score triballs from side of goal
 	robotRotateThenMoveTo(132, 36, false);
 	robot_set_heading_PID(180);
 	//Ram triballs twice
-	robot_set_velocity(-600, 600);
-	robot_set_velocity(600, 100);
-	robot_set_velocity(-600, 300);
+	robot_set_velocity(-100, 600);
+	robot_set_velocity(100, 100);
+	robot_set_velocity(-100, 300);
 
 	//Now go from the long side of the goal
 	//Move away from goal
-	robot_set_velocity(600, 250);
+	robot_set_velocity(100, 250);
 	
 	//Go to the short bar - long bar corner
 	robotRotateThenMoveTo(84, 36, false);
@@ -135,16 +141,16 @@ void auton_skills(){
 	robot_set_heading_PID(90);
 	//Open wings and score	
 	wings.set_value(1);
-	robot_set_velocity(600, 2000);
+	robot_set_velocity(100, 2000);
 	
 	//Now score the triball from an angle
 	//Get some space
-	robot_set_velocity(-600, 300);
+	robot_set_velocity(-100, 300);
 	robotRotateToPoint(84, 108, false);
 	//Go back, open wings, and ram into triballs from an angle
-	robot_set_velocity(-600, 2000);
+	robot_set_velocity(-100, 2000);
 	wings.set_value(1);
-	robot_set_velocity(600, 2000);
+	robot_set_velocity(100, 2000);
 
 	//Finally, score triballs from the side of the goal
 	//Leave this for now
@@ -225,6 +231,11 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
+	//Wait until the inertial is done calibratng
+	while (inertial.is_calibrating()){
+		pros::delay(20);
+	}
+	//Now start the autonomous
 	auton_skills();
 }
 
