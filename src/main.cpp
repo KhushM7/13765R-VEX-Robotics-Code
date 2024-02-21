@@ -22,9 +22,88 @@ std::atomic_bool isSwitchingPTO = false;
 
 //Autonomous functions
 void auton_defensive_SAFE_AWP(){
+	//First determine the starting position + heading
+	inertial.set_heading(135);
+	robot_heading = inertial.get_heading();
+	robot_x = 18; //Need to measure
+	robot_y = 12; //Need to measure
+
+	//Start the odometry task
+	pros::Task odom_task(odometry_tracker);
+
+	//Open wings
+	wings.set_value(1);
+	//Go forward and remove triball
+	robot_set_velocity(100, 500);
+
+	//Now go in front of the goal
+	robotMoveTo(14, 36, false);	
+	//Rotate to face goal and ram triballs in twice
+	robot_set_heading_PID(0);
+	//Outake triball whilst scoring it
+	intake.move_velocity(-600);
+	robot_set_velocity(100, 1000);
 	
+	//Move back and ram the triball again
+	robot_set_velocity(-100, 400);
+	robot_set_velocity(100, 600);
+
+	//Now go to EV bar and get AWP.
+	//Get some space
+	robot_set_velocity(-100, 300);
+	robotRotateThenMoveTo(36, 12, true);
+	//Reverse intake to hopefully get triballs to our offensive side
+	intake.move_velocity(-600);
+	robotRotateThenMoveTo(60, 12, true);
+	intake.brake();
 }
 
+//This route focusses on taking the two centre triballs away as 
+// fast as possible, by using our intake to remove the triballs
+// from the centre.
+void auton_defensive_CENTRAL_SNAG(){
+	//First determine the starting position + heading
+	inertial.set_heading(0);
+	robot_heading = inertial.get_heading();
+	robot_x = 30; //Need to measure
+	robot_y = 12; //Need to measure
+
+	//Start the odometry task
+	pros::Task odom_task(odometry_tracker);
+
+	//Go forward and then move to the centre triball
+	robot_set_velocity(100, 800);
+	//Now rotate whilst moving towards first centre triball
+	intake.move_voltage(12000);
+	robotMoveTo(44, 68, true);
+	//Now turn away and outake that triball
+	robotRotateToPoint(34, 34, true);
+	intake.move_voltage(-12000);
+	pros::delay(300);
+
+	//Now repeat with the other centre triball
+	intake.move_voltage(12000);
+	robotRotateThenMoveTo(66, 70, true);
+	//Now turn away and outake that triball
+	robotRotateToPoint(34, 34, true);
+	intake.move_voltage(-12000);
+
+	//Push triballs towards starting position
+	robotMoveTo(34, 34, true);
+	robot_set_heading_PID(0);
+	robot_set_velocity(-100, 800);
+	robotRotateThenMoveTo(14, 24, true);
+
+	//Remove corner triball
+	robot_set_heading_PID(135);
+	wings.set_value(1);
+	robot_set_velocity(100, 500);
+
+	//Now go and touch EV bar for AWP.
+	//Reverse intake to try and push triballs over to other side
+	intake.move_voltage(-12000);
+	robotMoveTo(62, 12, true); 
+}
 
 void auton_offensive(){
 	//First determine the starting position + heading
