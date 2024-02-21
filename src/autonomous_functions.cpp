@@ -348,7 +348,7 @@ bool robotRotateToPoint(double targetX, double targetY, bool frontFacing, bool f
     }
 	
 	//Now rotate to that heading
-	return robot_set_heading_PID(desired_heading, true);
+	return robot_set_heading_PID(desired_heading, failSafeIsON);
 }
 
 void robotRotateThenMoveTo(double targetX, double targetY, bool frontFacing, int PIDConstants){
