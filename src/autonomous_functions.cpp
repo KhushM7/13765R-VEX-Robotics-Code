@@ -363,12 +363,11 @@ void robotFollowPoints(double points[]){
 void robot_set_velocity(double percent, double milliseconds){
 	//Calculate desired speed based on gear ratios
 	double maindrivespeed = percent/100 * 600; //Blue gears
-	double PTOdrivespeed = percent/100 * 200; //Green gears
 	left_motors.move_velocity(maindrivespeed);	
 	right_motors.move_velocity(maindrivespeed);
 	if (is_PTO_on_base.load()){
-		catapultLeft.move_velocity(PTOdrivespeed);
-		catapultRight.move_velocity(PTOdrivespeed);
+		catapultLeft.move_velocity(maindrivespeed);
+		catapultRight.move_velocity(maindrivespeed);
 	}
 	
 	if (milliseconds != 0){
