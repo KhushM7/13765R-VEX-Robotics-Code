@@ -12,8 +12,8 @@ pros::Controller controller(CONTROLLER_MASTER);
 pros::Motor topLeft(9, MOTOR_GEAR_BLUE, true);
 pros::Motor topRight(1, MOTOR_GEAR_BLUE, false);
 
-pros::Motor catapultLeft(20, MOTOR_GEAR_BLUE, true);
-pros::Motor catapultRight(6, pros::E_MOTOR_GEAR_BLUE, false);
+pros::Motor catapultLeft(19, MOTOR_GEAR_BLUE, false);
+pros::Motor catapultRight(6, pros::E_MOTOR_GEAR_BLUE, true);
 pros::Motor_Group catapult_motors({catapultLeft, catapultRight});
 
 pros::Motor bottomLeft(10, MOTOR_GEAR_BLUE, true);
@@ -23,12 +23,12 @@ pros::Motor_Group left_motors({topLeft, bottomLeft});
 pros::Motor_Group right_motors({topRight, bottomRight});
 
 pros::ADIDigitalOut PTOpiston('E');
-std::atomic_bool is_PTO_on_base = false;
+std::atomic_bool is_PTO_on_base = true;
 
-pros::Motor intake(0, MOTOR_GEAR_BLUE, false);
+pros::Motor intake(11, MOTOR_GEAR_BLUE, false);
 
 pros::Motor flywheel(0, pros::E_MOTOR_GEAR_BLUE);
-pros::ADIDigitalOut wings('H');
+pros::ADIDigitalOut wings('A');
 
 //Initialise sensors
 pros::Imu inertial(8);
