@@ -122,7 +122,7 @@ void auton_offensive(){
 
 	//Go and intake centre triball.
 	//Directly move to the target
-	//intake.move_velocity(600);
+	intake.move_velocity(600);
 	robotRotateThenMoveTo(110, 90, true);
 	stop_robot();
 	pros::delay(2000); //Give time to actually intake triball
@@ -130,14 +130,14 @@ void auton_offensive(){
 	//Now score both centre triballs
 	robot_set_heading_PID(90);
 	wings.set_value(true); //May not do this in case opponent tries to stop us
-	//intake.move_velocity(-600)
+	intake.move_velocity(-600);
 	robot_set_velocity(100, 1000);
-	//intake.brake();
+	intake.brake();
 
 	//Go back and score non-neutral zone triballs
 	robot_set_velocity(-100, 400); //Get some space
 	//Walk to the triball nearest to us
-	//intake.set_velocity(600)
+	intake.move_velocity(600);
 	robotRotateThenMoveTo(74, 51, true);
 	pros::delay(200); //Give time to fully intake it
 	//Now go to the matchload bar
@@ -315,7 +315,7 @@ void autonomous() {
 		pros::delay(20);
 	}
 	//Now start the autonomous
-	auton_skills();
+	auton_offensive();
 }
 
 //Gets the hottest motor, printing a two character code that represents the motor
@@ -422,7 +422,10 @@ void switch_PTO_state(){
 			else{
 				//Switch to 4 motor drive
 				PTOpiston.set_value(0);
-			}	
+			}
+
+			//Now restore driver control
+			isSwitchingPTO = false;	
 		}
 		pros::delay(40);
 	}
@@ -553,11 +556,11 @@ void opcontrol() {
 		//Wings
 		if (controller.get_digital_new_press(DIGITAL_L1)){
 			if (wingsAreOpen){
-				wings.set_value(false);
+				wings.set_value(0);
 				wingsAreOpen = false;
 			}
 			else{
-				wings.set_value(true);
+				wings.set_value(1);
 				wingsAreOpen = true;
 			}
 		}
@@ -590,16 +593,16 @@ void opcontrol() {
 		}  
 
 		//Lift code
-		if (controller.get_digital_new_press(DIGITAL_L2)){
-			if (is_PTO_on_base.load()){
-				isSwitchingPTO = true;
-			}
-			else{
-				//Run lift code
-				//For now it is just a vibration on controller
-				controller.rumble("-");
-			}
-		}
+		// if (controller.get_digital_new_press(DIGITAL_L2)){
+		// 	if (is_PTO_on_base.load()){
+		// 		isSwitchingPTO = true;
+		// 	}
+		// 	else{
+		// 		//Run lift code
+		// 		//For now it is just a vibration on controller
+		// 		controller.rumble("-");
+		// 	}
+		// }
 		
 		//Switch to 6 motor drive
 		if (controller.get_analog(ANALOG_LEFT_X) <= -120
