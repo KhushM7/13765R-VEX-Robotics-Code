@@ -29,6 +29,7 @@ pros::Motor intake(2, MOTOR_GEAR_BLUE, false);
 
 pros::Motor flywheel(0, pros::E_MOTOR_GEAR_BLUE);
 pros::ADIDigitalOut wings('A');
+pros::ADIDigitalOut flappy_wings('B');
 
 //Initialise sensors
 pros::Imu inertial(20);

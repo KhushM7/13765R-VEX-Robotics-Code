@@ -459,17 +459,17 @@ void opcontrol() {
 	controller.clear_line(0);
 
 	//Variables for double-binding
-	bool wingsAreOpen = false;
 	bool isClawDown = false;
 	bool isIntakeOff = true;
 	int intakeState = 0; //0 = off; 1 = forward; -1 = reverse
 	bool hangIsDown = false;
 	bool catapultIsMoving = false;
-
-	//To ensure catapult cannot be touched whilst its shooting
 	bool flywheelIsMoving = false;
-	bool hasLeftBumperSwitch = false;
-	
+
+	//Wing variables
+	int32_t wingTimer = 0;	
+	bool solidWingsAreOpen = false;
+	bool flappy_wingsAreOpen = false;
 
 	//Start display task which will display both motor temperatures
 	// and the current PTO state
@@ -548,15 +548,48 @@ void opcontrol() {
 
 		//Wings
 		if (controller.get_digital_new_press(DIGITAL_L1)){
-			if (wingsAreOpen){
-				wings.set_value(0);
-				wingsAreOpen = false;
-			}
-			else{
-				wings.set_value(1);
-				wingsAreOpen = true;
+			//Start a timer here
+			wingTimer = pros::millis();
+		}
+
+		if (controller.get_digital(DIGITAL_L1)){
+			//Check if the timer has been started
+			if (wingTimer != 0){
+				//Check how much time has elapsed
+				if (pros::millis() - wingTimer > 750){
+					//If the wings have been held down for a long time
+					//Flappy wings
+					flappy_wings.set_value(1);
+					flappy_wingsAreOpen = true;					
+				}				
 			}
 		}
+		else{
+			//If we have just released the wings button
+			if (wingTimer != 0){
+				if (flappy_wingsAreOpen){
+					//Go to solid wings
+					solidWingsAreOpen = true;
+					flappy_wingsAreOpen = false;
+					wings.set_value(1);
+				}
+				//The only way the flappy wings are closed is if 
+				// the button was quickly pressed.
+				else{
+					//Normal toggle code
+					if (solidWingsAreOpen){
+						wings.set_value(0);
+						solidWingsAreOpen = false;
+					}
+					else{
+						wings.set_value(1);
+						solidWingsAreOpen = true;
+					}
+				}
+				wingTimer = 0; //Reset wing timer.
+			}
+		}
+		
 
 		//Flywheel
 		if (controller.get_digital_new_press(DIGITAL_A)){

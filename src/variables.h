@@ -25,6 +25,7 @@ extern pros::Motor_Group catapult_motors;
 extern pros::Motor hang;
 extern pros::Motor flywheel;
 extern pros::ADIDigitalOut wings;
+extern pros::ADIDigitalOut flappy_wings;
 
 extern pros::ADIDigitalOut PTOpiston;
 extern std::atomic_bool is_PTO_on_base;
