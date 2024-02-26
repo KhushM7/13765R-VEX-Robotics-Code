@@ -640,9 +640,18 @@ void opcontrol() {
 		&& controller.get_analog(ANALOG_LEFT_Y) <= -120)
 		{
 			isSwitchingPTO = true;
-		}	
-
+		}			
 		
+		if (controller.get_digital_new_press(DIGITAL_LEFT)){
+			if (is_PTO_on_base){
+				PTOpiston.set_value(1);
+				is_PTO_on_base = false;
+			}
+			else{
+				PTOpiston.set_value(0);
+				is_PTO_on_base = true;
+			}
+		}
 
 		pros::delay(10); //Refresh rate of a motor
 	}
