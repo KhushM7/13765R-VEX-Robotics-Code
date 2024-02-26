@@ -462,6 +462,7 @@ void opcontrol() {
 	bool wingsAreOpen = false;
 	bool isClawDown = false;
 	bool isIntakeOff = true;
+	int intakeState = 0; //0 = off; 1 = forward; -1 = reverse
 	bool hangIsDown = false;
 	bool catapultIsMoving = false;
 
@@ -525,15 +526,15 @@ void opcontrol() {
 
 		//Toggle intake when Button R1 is pressed (make intake go forward)
 		if (controller.get_digital_new_press(DIGITAL_R1)){
-			if (isIntakeOff){
+			if (intakeState != 1){
 				//Forward intake
-				intake.move_velocity(600);
-				isIntakeOff = false;
+				intake.move(127);
+				intakeState = 1;
 			}
 			else{
-				//Make intake stop
-				intake.brake();
-				isIntakeOff = true;
+				//Reverse intake
+				intake.move(-127);
+				intakeState = -1;
 			}
 		}
 
@@ -541,16 +542,8 @@ void opcontrol() {
 		
 		//Turn off intake when Button R2 is pressed (make intake reverse)
 		if (controller.get_digital_new_press(DIGITAL_R2)){
-			if (isIntakeOff){
-				//Reverse intake
-				intake.move_velocity(-600);
-				isIntakeOff = false;
-			}
-			else{
-				//Make intake stop
-				intake.brake();
-				isIntakeOff = true;
-			}
+			intake.brake();
+			intakeState = 0;
 		}
 
 		//Wings
@@ -608,7 +601,7 @@ void opcontrol() {
 		if (controller.get_analog(ANALOG_LEFT_X) <= -120
 		&& controller.get_analog(ANALOG_LEFT_Y) <= -120)
 		{
-			is_PTO_on_base = false;
+			isSwitchingPTO = true;
 		}	
 
 		
