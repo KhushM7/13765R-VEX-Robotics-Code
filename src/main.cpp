@@ -31,10 +31,12 @@ void auton_defensive_SAFE_AWP(){
 	//Start the odometry task
 	pros::Task odom_task(odometry_tracker);
 
+	//Go back to get space
+	robot_set_velocity(-100, 400);
 	//Open wings
 	wings.set_value(1);
 	//Go forward and remove triball
-	robot_set_velocity(100, 500);
+	robot_set_velocity(100, 800);
 
 	//Now go in front of the goal
 	robotMoveTo(14, 36, false);	
@@ -122,22 +124,22 @@ void auton_offensive(){
 
 	//Go and intake centre triball.
 	//Directly move to the target
-	intake.move_velocity(600);
+	intake.move(127);
 	robotRotateThenMoveTo(110, 90, true);
 	stop_robot();
-	pros::delay(2000); //Give time to actually intake triball
+	pros::delay(200); //Give time to actually intake triball
 	
 	//Now score both centre triballs
 	robot_set_heading_PID(90);
-	wings.set_value(true); //May not do this in case opponent tries to stop us
-	intake.move_velocity(-600);
+	//wings.set_value(true); //May not do this in case opponent tries to stop us
+	intake.move(-127);
 	robot_set_velocity(100, 1000);
 	intake.brake();
 
 	//Go back and score non-neutral zone triballs
 	robot_set_velocity(-100, 400); //Get some space
 	//Walk to the triball nearest to us
-	intake.move_velocity(600);
+	intake.move(127);
 	robotRotateThenMoveTo(74, 51, true);
 	pros::delay(200); //Give time to fully intake it
 	//Now go to the matchload bar
@@ -155,12 +157,15 @@ void auton_offensive(){
 		robotRotateToPoint(128, 96, true);
 	}
 
+	//Remove triball from intake
+	intake.move(-127);
+
 	//Ram the triballs twice to finish off the routine
 	robot_set_velocity(100, 800);
 	robot_set_velocity(-100, 500);
 	robot_set_velocity(100,800);
 	
-	//MOve away from goal to avoid touching triballs
+	//Move away from goal to avoid touching triballs
 	robot_set_velocity(-100, 500);
 	
 }
