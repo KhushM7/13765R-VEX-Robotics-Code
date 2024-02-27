@@ -25,7 +25,7 @@ void auton_defensive_SAFE_AWP(){
 	//First determine the starting position + heading
 	inertial.set_heading(135);
 	robot_heading = inertial.get_heading();
-	robot_x = 18; //Need to measure
+	robot_x = 24; //Need to measure
 	robot_y = 12; //Need to measure
 
 	//Start the odometry task
@@ -39,7 +39,7 @@ void auton_defensive_SAFE_AWP(){
 	robot_set_velocity(100, 800);
 
 	//Now go in front of the goal
-	robotMoveTo(14, 36, false);	
+	robotMoveTo(14, 36, false, 1);	
 	//Rotate to face goal and ram triballs in twice
 	robot_set_heading_PID(0);
 	//Outake triball whilst scoring it
@@ -47,53 +47,42 @@ void auton_defensive_SAFE_AWP(){
 	robot_set_velocity(100, 1000);
 	
 	//Move back and ram the triball again
-	robot_set_velocity(-100, 400);
-	robot_set_velocity(100, 600);
+	//robot_set_velocity(-100, 400);
+	//robot_set_velocity(100, 600);
 
 	//Now go to EV bar and get AWP.
 	//Get some space
 	robot_set_velocity(-100, 300);
-	robotRotateThenMoveTo(36, 12, true);
+	robotRotateThenMoveTo(36, 12, true, 1);
 	//Reverse intake to hopefully get triballs to our offensive side
 	intake.move_velocity(-600);
-	robotRotateThenMoveTo(60, 12, true);
+	robotRotateThenMoveTo(60, 12, true, 1);
 	intake.brake();
 }
 
-//This route focusses on taking the two centre triballs away as 
+//This route focusses on taking the one of the centre triballs away as 
 // fast as possible, by using our intake to remove the triballs
 // from the centre.
 void auton_defensive_CENTRAL_SNAG(){
 	//First determine the starting position + heading
 	inertial.set_heading(0);
 	robot_heading = inertial.get_heading();
-	robot_x = 30; //Need to measure
+	robot_x = 36; //Need to measure
 	robot_y = 12; //Need to measure
 
 	//Start the odometry task
 	pros::Task odom_task(odometry_tracker);
 
 	//Go forward and then move to the centre triball
-	robot_set_velocity(100, 800);
+	robot_set_velocity(100, 400);
 	//Now rotate whilst moving towards first centre triball
 	intake.move_voltage(12000);
-	robotMoveTo(44, 68, true);
-	//Now turn away and outake that triball
+	robotMoveTo(48,59, true);
+	//Now turn away
 	robotRotateToPoint(34, 34, true);
-	intake.move_voltage(-12000);
-	pros::delay(300);
-
-	//Now repeat with the other centre triball
-	intake.move_voltage(12000);
-	robotRotateThenMoveTo(66, 70, true);
-	//Now turn away and outake that triball
-	robotRotateToPoint(34, 34, true);
-	intake.move_voltage(-12000);
 
 	//Push triballs towards starting position
 	robotMoveTo(34, 34, true);
-	robot_set_heading_PID(0);
-	robot_set_velocity(-100, 800);
 	robotRotateThenMoveTo(14, 24, true);
 
 	//Remove corner triball
@@ -104,7 +93,7 @@ void auton_defensive_CENTRAL_SNAG(){
 	//Now go and touch EV bar for AWP.
 	//Reverse intake to try and push triballs over to other side
 	intake.move_voltage(-12000);
-	robotMoveTo(62, 12, true); 
+	robotMoveTo(63, 10, true, 3); 
 }
 
 void auton_offensive(){
@@ -126,9 +115,8 @@ void auton_offensive(){
 	//Directly move to the target
 	intake.move(127);
 	robot_set_velocity(100, 400);
-	robotMoveTo(100, 65, true,1);
+	robotMoveTo(76, 65, true, 1);
 	stop_robot();
-	pros::delay(200); //Give time to actually intake triball
 	
 	//Now score both centre triballs
 	robot_set_heading_PID(90, false);
@@ -138,14 +126,13 @@ void auton_offensive(){
 	intake.brake();
 
 	//Go back and score non-neutral zone triballs
-	robot_set_velocity(-100, 400); //Get some space
+	robot_set_velocity(-100, 100); //Get some space
 	//Walk to the triball nearest to us
 	intake.move(127);
-	robotRotateThenMoveTo(74, 51, true);
-	pros::delay(200); //Give time to fully intake it
+	robotRotateThenMoveTo(79.2, 51, true);
 	//Now go to the matchload bar
 	robotRotateThenMoveTo(108, 36, true);
-	robotRotateThenMoveTo(117, 14, true);
+	robotRotateThenMoveTo(117, 14, true, 1);
 	//Remove triball from corner
 	robot_set_heading_PID(45);
 	wings.set_value(1);
@@ -321,7 +308,7 @@ void autonomous() {
 		pros::delay(20);
 	}
 	//Now start the autonomous
-	auton_offensive();
+	auton_defensive_CENTRAL_SNAG();
 }
 
 //Gets the hottest motor, printing a two character code that represents the motor

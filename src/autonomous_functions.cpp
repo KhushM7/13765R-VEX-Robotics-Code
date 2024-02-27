@@ -143,7 +143,13 @@ void robotMoveTo(double targetX, double targetY, bool frontFacing, int PIDConsta
 	double turn_kP = 30;
 
 	if (PIDConstants == 1){
-		turn_kP = 2;
+		turn_kP = 20;
+	}
+	else if (PIDConstants == 2){
+		turn_kP = 40;
+	}
+	else if (PIDConstants == 3){
+		turn_kP = 12;
 	}
 
 	double turnError = 0;
@@ -243,7 +249,7 @@ void robotMoveTo(double targetX, double targetY, bool frontFacing, int PIDConsta
 
 		//Reset turn velocity if the robot is too close to the target
 		//For now, this is when the robot is 6 inches away from the target
-		if (abs(driveError) < 6){
+		if (abs(driveError) < 3){
 			disableTurnVel = true;
 		}
 		
@@ -387,7 +393,7 @@ bool robot_set_heading_PID(double angle, bool failSafeIsON)
 {
 	//Let's define some variables that will be useful for PID
 	double kP = 2.53;
-	double kI = 0.21;
+	double kI = 0.31;
 	double kD = 0.51;
 
 	double current_angle = robot_heading.load();
