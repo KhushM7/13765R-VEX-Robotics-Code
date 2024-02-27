@@ -109,10 +109,10 @@ void auton_defensive_CENTRAL_SNAG(){
 
 void auton_offensive(){
 	//First determine the starting position + heading
-	inertial.set_heading(0); //Need to change
+	inertial.set_heading(0); 
 	robot_heading = inertial.get_heading();
-	robot_x = 112; //Need to measure
-	robot_y = 14.5; //Need to measure
+	robot_x = 108; //Need to measure
+	robot_y = 16; //Need to measure
 
 	//Start the odometry task
 	pros::Task odom_task(odometry_tracker);
@@ -125,13 +125,14 @@ void auton_offensive(){
 	//Go and intake centre triball.
 	//Directly move to the target
 	intake.move(127);
-	robotRotateThenMoveTo(110, 90, true);
+	robot_set_velocity(100, 400);
+	robotMoveTo(100, 65, true,1);
 	stop_robot();
 	pros::delay(200); //Give time to actually intake triball
 	
 	//Now score both centre triballs
-	robot_set_heading_PID(90);
-	//wings.set_value(true); //May not do this in case opponent tries to stop us
+	robot_set_heading_PID(90, false);
+	
 	intake.move(-127);
 	robot_set_velocity(100, 1000);
 	intake.brake();
@@ -547,8 +548,15 @@ void opcontrol() {
 		
 		//Turn off intake when Button R2 is pressed (make intake reverse)
 		if (controller.get_digital_new_press(DIGITAL_R2)){
-			intake.brake();
-			intakeState = 0;
+			//Toggle intake between stop and reverse
+			if (intakeState == 0){
+				intake.move(-127);
+				intakeState = -1;
+			}
+			else{
+				intake.brake();
+				intakeState = 0;
+			}
 		}
 
 		//Wings
