@@ -151,6 +151,9 @@ void robotMoveTo(double targetX, double targetY, bool frontFacing, int PIDConsta
 	else if (PIDConstants == 3){
 		turn_kP = 12;
 	}
+	else if (PIDConstants == 4){
+		turn_kP = 1;
+	}
 
 	double turnError = 0;
 	double driveError = std::sqrt(pow(targetX - robot_x.load(), 2) + pow(targetY - robot_y.load(), 2));
@@ -257,13 +260,13 @@ void robotMoveTo(double targetX, double targetY, bool frontFacing, int PIDConsta
 			turnVelocity = 0;
 		}
 
-		if (abs(left_motors.get_actual_velocities()[0]) < 0.2 && abs(right_motors.get_actual_velocities()[0]) < 0.2){
+		if (abs(right_tracker.get_velocity()) < 500){
 			if (failsafetimer == 0){
 				failsafetimer = pros::millis();
 			}
 			//If the robot is basically not moving for 300 ms
 			else if (pros::millis() - failsafetimer > 300){
-				break;
+				return;
 			}
 			
 		}

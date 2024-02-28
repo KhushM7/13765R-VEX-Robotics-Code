@@ -84,7 +84,7 @@ void auton_defensive_CENTRAL_SNAG(){
 	//Now turn away
 	robotRotateToPoint(34, 34, true);
 
-	//Push triballs towards starting position
+	//Go to matchload bar
 	robotMoveTo(34, 34, true);
 	intake.move(-128);
 	robotRotateThenMoveTo(14, 24, true);
@@ -116,7 +116,7 @@ void auton_offensive(){
 	intake.move(-127);
 	robot_set_velocity(100, 400);
 	intake.move(127);
-	robotMoveTo(76, 65, true, 1);
+	robotMoveTo(76, 65, true, 3);
 	stop_robot();
 	
 	//Now score both centre triballs
@@ -131,10 +131,10 @@ void auton_offensive(){
 	robot_set_velocity(-100, 100); //Get some space
 	//Walk to the triball nearest to us
 	intake.move(127);
-	robotRotateThenMoveTo(114, 48, true);
-	robotRotateThenMoveTo(79.2,48, true);
+	robotRotateThenMoveTo(96, 44, true);
+	robotRotateThenMoveTo(81,44, true);
 	//Now go score stuff
-	robot_set_heading_PID(0);
+	robot_set_heading_PID(90);
 	intake.move(-127);
 	wings.set_value(1);
 	robot_set_velocity(100, 1000);
@@ -144,45 +144,61 @@ void auton_offensive(){
 }
 
 void auton_skills(){
-	//We will start facing the goal
+	//Start a timer so that we can know how long 
+	//there is left in the auton
+	uint32_t startTime  = pros::millis();
+
 	//First determine the starting position + heading
-	inertial.set_heading(337.2); //Need to change
+	inertial.set_heading(0);
 	robot_heading = inertial.get_heading();
-	robot_x = 24; //Need to measure
-	robot_y = 15; //Need to measure
+	robot_x = 36; 
+	robot_y = 16; 
 
 	//Start the odometry task now
 	pros::Task odom_task(odometry_tracker);
 
 	//Now begin actual routine.
-	//Matchloading phase
-	controller.rumble("-");
-	pros::delay(1000);
-	
-	/*
 	//Now go score red triballs
-	robotRotateToPoint(24, 48, true);
-	//Flick triball with wings
 	wings.set_value(1);
-	//Now rotate and score the triballs
-	robotRotateToPoint(12, 36, false);
-	robot_set_velocity(100, 500);
-	robot_set_velocity(-100, 900);
-	*/
+	pros::delay(200);
+	//Start flywheel
+	flywheel.move(100);
+	//Now rotate and go to the matchload bar
+	robotRotateThenMoveTo(8, 32, true, 4);	
+
+	//Rotate to the other goal and start matchloading
+	robot_set_heading_PID(175);
+	//Wait till there are 25 seconds left
+	while (pros::millis() - startTime > 59000){
+		pros::delay(20);
+	}
+
+	//Stop the matchloading phase
+	flywheel.brake();
+	wings.set_value(0); //Now we can close the wings
+
+	//Score the red triballs
+	robot_set_velocity(-100, 100); //Get some space
+	robot_set_heading_PID(0);
+	//Ram into the triballs now
+	robot_set_velocity(100, 700);
+	
 	//Now move to the other side of the field
 	//Get some space
-	robot_set_velocity(100, 100);
-	//Move to otherside now
+	robot_set_velocity(-100, 100);
+	//Move to other side now
+	//Reverse the intake to ensure we are not possessing triballs
+	intake.move(-127); 
 	robotRotateThenMoveTo(36, 11, true);
 	robotRotateThenMoveTo(108, 11, true, 1);
 
 	//Score triballs from side of goal
-	robotRotateThenMoveTo(132, 36, false);
-	robot_set_heading_PID(180);
+	robotRotateThenMoveTo(132, 36, true);
+	robot_set_heading_PID(0);
 	//Ram triballs twice
-	robot_set_velocity(-100, 600);
-	robot_set_velocity(100, 100);
-	robot_set_velocity(-100, 300);
+	robot_set_velocity(100, 600);
+	robot_set_velocity(-100, 100);
+	robot_set_velocity(100, 300);
 
 	//Now go from the long side of the goal
 	//Move away from goal
@@ -199,18 +215,16 @@ void auton_skills(){
 	//Open wings and score	
 	wings.set_value(1);
 	robot_set_velocity(100, 2000);
+	wings.set_value(0);
 	
 	//Now score the triball from an angle
 	//Get some space
 	robot_set_velocity(-100, 300);
-	robotRotateToPoint(84, 108, false);
+	robotRotateToPoint(80, 84, false);
 	//Go back, open wings, and ram into triballs from an angle
-	robot_set_velocity(-100, 2000);
+	robot_set_velocity(-100, 800);
 	wings.set_value(1);
-	robot_set_velocity(100, 2000);
-
-	//Finally, score triballs from the side of the goal
-	//Leave this for now
+	robot_set_velocity(100, 1000);	
 }
 
 /**
@@ -293,7 +307,7 @@ void autonomous() {
 		pros::delay(20);
 	}
 	//Now start the autonomous
-	auton_offensive();
+	auton_skills();
 }
 
 //Gets the hottest motor, printing a two character code that represents the motor

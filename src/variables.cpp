@@ -25,13 +25,13 @@ pros::Motor_Group right_motors({topRight, bottomRight});
 pros::ADIDigitalOut PTOpiston('E');
 std::atomic_bool is_PTO_on_base = true;
 
-pros::Motor intake(2, MOTOR_GEAR_BLUE, false);
+pros::Motor intake(20, MOTOR_GEAR_BLUE, false);
 
 pros::Motor flywheel(0, pros::E_MOTOR_GEAR_BLUE);
 pros::ADIDigitalOut wings('A');
 pros::ADIDigitalOut flappy_wings('B');
 
 //Initialise sensors
-pros::Imu inertial(20);
+pros::Imu inertial(2);
 pros::Rotation right_tracker(4);
 pros::Rotation back_tracker(10, true);
