@@ -36,7 +36,10 @@ void auton_defensive_SAFE_AWP(){
 	//Open wings
 	wings.set_value(1);
 	//Go forward and remove triball
-	robot_set_velocity(100, 800);
+	left_motors.move(80);
+	right_motors.move(128);
+	pros::delay(600);
+	wings.set_value(0);
 
 	//Now go in front of the goal
 	robotMoveTo(14, 36, false, 1);	
@@ -47,8 +50,8 @@ void auton_defensive_SAFE_AWP(){
 	robot_set_velocity(100, 1000);
 	
 	//Move back and ram the triball again
-	//robot_set_velocity(-100, 400);
-	//robot_set_velocity(100, 600);
+	robot_set_velocity(-100, 400);
+	robot_set_velocity(100, 600);
 
 	//Now go to EV bar and get AWP.
 	//Get some space
@@ -83,12 +86,14 @@ void auton_defensive_CENTRAL_SNAG(){
 
 	//Push triballs towards starting position
 	robotMoveTo(34, 34, true);
+	intake.move(-128);
 	robotRotateThenMoveTo(14, 24, true);
 
 	//Remove corner triball
 	robot_set_heading_PID(135);
 	wings.set_value(1);
 	robot_set_velocity(100, 500);
+	wings.set_value(0);
 
 	//Now go and touch EV bar for AWP.
 	//Reverse intake to try and push triballs over to other side
@@ -106,15 +111,11 @@ void auton_offensive(){
 	//Start the odometry task
 	pros::Task odom_task(odometry_tracker);
 
-	//Flick alliance triball with wings.
-	wings.set_value(true);
-	pros::delay(200);
-	wings.set_value(false); //Close them again
-
 	//Go and intake centre triball.
 	//Directly move to the target
-	intake.move(127);
+	intake.move(-127);
 	robot_set_velocity(100, 400);
+	intake.move(127);
 	robotMoveTo(76, 65, true, 1);
 	stop_robot();
 	
@@ -122,6 +123,7 @@ void auton_offensive(){
 	robot_set_heading_PID(90, false);
 	
 	intake.move(-127);
+	wings.set_value(1);
 	robot_set_velocity(100, 1000);
 	intake.brake();
 
@@ -129,33 +131,16 @@ void auton_offensive(){
 	robot_set_velocity(-100, 100); //Get some space
 	//Walk to the triball nearest to us
 	intake.move(127);
-	robotRotateThenMoveTo(79.2, 51, true);
-	//Now go to the matchload bar
-	robotRotateThenMoveTo(108, 36, true);
-	robotRotateThenMoveTo(117, 14, true, 1);
-	//Remove triball from corner
-	robot_set_heading_PID(45);
-	wings.set_value(1);
-	robot_set_velocity(100, 700);
-
-	//Now rotate to score
-	if (!robot_set_heading_PID(0)){
-		//If we get caught on the bar
-		robot_set_velocity(100, 100);
-		robotRotateToPoint(128, 96, true);
-	}
-
-	//Remove triball from intake
+	robotRotateThenMoveTo(114, 48, true);
+	robotRotateThenMoveTo(79.2,48, true);
+	//Now go score stuff
+	robot_set_heading_PID(0);
 	intake.move(-127);
+	wings.set_value(1);
+	robot_set_velocity(100, 1000);
+	robot_set_velocity(-100, 300);
+	robot_set_velocity(100, 500);
 
-	//Ram the triballs twice to finish off the routine
-	robot_set_velocity(100, 800);
-	robot_set_velocity(-100, 500);
-	robot_set_velocity(100,800);
-	
-	//Move away from goal to avoid touching triballs
-	robot_set_velocity(-100, 500);
-	
 }
 
 void auton_skills(){
@@ -308,7 +293,7 @@ void autonomous() {
 		pros::delay(20);
 	}
 	//Now start the autonomous
-	auton_defensive_CENTRAL_SNAG();
+	auton_offensive();
 }
 
 //Gets the hottest motor, printing a two character code that represents the motor
@@ -455,7 +440,7 @@ void opcontrol() {
 	bool isClawDown = false;
 	bool isIntakeOff = true;
 	int intakeState = 0; //0 = off; 1 = forward; -1 = reverse
-	bool hangIsDown = false;
+	bool hangIsMoving = false;
 	bool catapultIsMoving = false;
 	bool flywheelIsMoving = false;
 
@@ -592,7 +577,7 @@ void opcontrol() {
 		
 
 		//Flywheel
-		if (controller.get_digital_new_press(DIGITAL_A)){
+		if (controller.get_digital_new_press(DIGITAL_LEFT)){
 			if (flywheelIsMoving){
 				//Stop flywheel
 				flywheel.brake();
@@ -605,7 +590,7 @@ void opcontrol() {
 			}
 		}
 
-		if (controller.get_digital_new_press(DIGITAL_Y)){
+		if (controller.get_digital_new_press(DIGITAL_UP)){
 			if (flywheelIsMoving){
 				//Stop flywheel
 				flywheel.brake();
@@ -619,34 +604,57 @@ void opcontrol() {
 		}  
 
 		//Lift code
-		// if (controller.get_digital_new_press(DIGITAL_L2)){
-		// 	if (is_PTO_on_base.load()){
-		// 		isSwitchingPTO = true;
-		// 	}
-		// 	else{
-		// 		//Run lift code
-		// 		//For now it is just a vibration on controller
-		// 		controller.rumble("-");
-		// 	}
-		// }
-		
-		//Switch to 6 motor drive
-		if (controller.get_analog(ANALOG_LEFT_X) <= -120
-		&& controller.get_analog(ANALOG_LEFT_Y) <= -120)
-		{
-			isSwitchingPTO = true;
-		}			
-		
-		if (controller.get_digital_new_press(DIGITAL_LEFT)){
-			if (is_PTO_on_base){
+		if (controller.get_digital_new_press(DIGITAL_A)){
+			if (is_PTO_on_base.load()){
 				PTOpiston.set_value(1);
 				is_PTO_on_base = false;
 			}
+			
 			else{
+				//Run lift code
+				//For now it is just a vibration on controller
+				if (hangIsMoving){
+					catapult_motors.brake();
+					hangIsMoving = false;
+				}
+				else{
+					catapult_motors.move_voltage(12000);
+					hangIsMoving = true;
+				}
+			}
+		}
+
+		if (controller.get_digital_new_press(DIGITAL_X)){
+			if (is_PTO_on_base.load()){
+				PTOpiston.set_value(1);
+				is_PTO_on_base = false;
+			}
+			
+			else{
+				//Run lift code
+				//For now it is just a vibration on controller
+				if (hangIsMoving){
+					catapult_motors.brake();
+					hangIsMoving = false;
+				}
+				else{
+					catapult_motors.move_voltage(-12000);
+					hangIsMoving = true;
+				}
+			}
+		}
+		
+		//Switch to 6 motor drive
+		if (controller.get_analog(ANALOG_LEFT_X) <= -110
+		&& controller.get_analog(ANALOG_RIGHT_X) <= -110)
+		{
+			if (!is_PTO_on_base){
 				PTOpiston.set_value(0);
 				is_PTO_on_base = true;
 			}
-		}
+			
+		}			
+		
 
 		pros::delay(10); //Refresh rate of a motor
 	}
